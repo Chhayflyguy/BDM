@@ -12,7 +12,7 @@
                     <form method="POST" action="{{ route('customers.update', $customer) }}">
                         @csrf
                         @method('PATCH')
-                        
+
                         <div>
                             <x-input-label for="name" :value="__('Customer Name')" />
                             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $customer->name)" required autofocus />
@@ -56,7 +56,6 @@
                                 @endforeach
                             </div>
                         </div>
-
                         <div class="mt-6">
                             <x-input-label :value="__('Problem Areas')" />
                             <div class="mt-2 grid grid-cols-2 gap-4">
@@ -66,6 +65,22 @@
                                     <span class="ms-2 text-sm text-gray-600">{{ $area }}</span>
                                 </label>
                                 @endforeach
+                            </div>
+                        </div>
+
+                        <div class="mt-6 border-t pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">VIP Details</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="vip_card_id" :value="__('VIP Card ID')" />
+                                    <x-text-input id="vip_card_id" class="block mt-1 w-full" type="text" name="vip_card_id" :value="old('vip_card_id', $customer->vip_card_id)" />
+                                </div>
+
+                                {{-- THIS IS THE NEW FIELD TO ADD --}}
+                                <div>
+                                    <x-input-label for="vip_card_expires_at" :value="__('VIP Card Expires At')" />
+                                    <x-text-input id="vip_card_expires_at" class="block mt-1 w-full" type="date" name="vip_card_expires_at" :value="old('vip_card_expires_at', $customer->vip_card_expires_at?->format('Y-m-d'))" />
+                                </div>
                             </div>
                         </div>
 

@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\Notification; // NEW
 class CustomerController extends Controller
 {
     use AuthorizesRequests;
+    private $vipPackages = [
+        'vip' => ['price' => 250, 'offer' => 50, 'validity_months' => 6, 'name' => 'VIP Card'],
+        'silver' => ['price' => 500, 'offer' => 150, 'validity_months' => 6, 'name' => 'Silver Card'],
+        'golden' => ['price' => 1000, 'offer' => 500, 'validity_months' => 12, 'name' => 'Golden Card'],
+        'diamond' => ['price' => 2000, 'offer' => 1000, 'validity_years' => 12, 'name' => 'Diamond Card'],
+    ];
+
     public function index(Request $request)
     {
         $query = Customer::where('user_id', Auth::id()); // Start query for the logged-in user
@@ -45,8 +52,7 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'vip_card_id' => ['nullable', 'string', 'max:255', Rule::unique('customers', 'vip_card_id')],
-            'vip_card_balance' => 'nullable|numeric|min:0',
-            'vip_card_expires_at' => 'nullable|date',
+            'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
             'gender' => 'nullable|in:Male,Female,Other',
             'age' => 'nullable|integer|min:0',
             'height' => 'nullable|string|max:10',
@@ -61,23 +67,28 @@ class CustomerController extends Controller
         $validated['user_id'] = Auth::id();
         $validated['customer_gid'] = $customerGid;
 
-        $customer = Customer::create($validated);
-
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
-
-        if (!empty($validated['vip_card_balance']) && $validated['vip_card_balance'] > 0) {
-            CustomerLog::create([
-                'user_id' => Auth::id(),
-                'customer_id' => $customer->id,
-                'payment_method' => 'VIP Top-Up',
-                'payment_amount' => $validated['vip_card_balance'],
-                'status' => 'completed',
-                'is_vip_top_up' => true,
-                'completed_at' => now()
-            ]);
+        if (!empty($validated['vip_package'])) {
+            $package = $this->vipPackages[$validated['vip_package']];
+            $validated['vip_card_type'] = $package['name'];
+            $validated['vip_card_balance'] = $package['price'] + $package['offer'];
+            $validated['vip_card_expires_at'] = isset($package['validity_years']) 
+                ? now()->addYears($package['validity_years']) 
+                : now()->addMonths($package['validity_months']);
         }
 
-         return redirect()->route('customers.index')->with('success', 'New customer created successfully!');
+        $customer = Customer::create($validated);
+
+        if (!empty($validated['vip_package'])) {
+            $package = $this->vipPackages[$validated['vip_package']];
+            CustomerLog::create([
+                'user_id' => Auth::id(), 'customer_id' => $customer->id,
+                'payment_method' => 'VIP Top-Up', 'payment_amount' => $package['price'],
+                'status' => 'completed', 'is_vip_top_up' => true, 'completed_at' => now()
+            ]);
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
+        }
+
+        return redirect()->route('customers.index')->with('success', 'New customer created successfully!');
     }
 
     /**
@@ -113,6 +124,7 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'vip_card_id' => ['nullable', 'string', 'max:255', Rule::unique('customers', 'vip_card_id')->ignore($customer->id)],
+            'vip_card_expires_at' => 'nullable|date',
             'gender' => 'nullable|in:Male,Female,Other',
             'age' => 'nullable|integer|min:0',
             'height' => 'nullable|string|max:10',
@@ -131,31 +143,27 @@ class CustomerController extends Controller
         $this->authorize('update', $customer);
 
         $validated = $request->validate([
-            'top_up_amount' => 'required|numeric|min:1',
-            'vip_card_expires_at' => 'nullable|date',
+            'vip_package' => ['required', 'string', Rule::in(array_keys($this->vipPackages))],
         ]);
 
         // Add to customer's balance
-        $customer->vip_card_balance += $validated['top_up_amount'];
-
-        if (!empty($validated['vip_card_expires_at'])) {
-            $customer->vip_card_expires_at = $validated['vip_card_expires_at'];
-        }
+        $package = $this->vipPackages[$validated['vip_package']];
+        
+        $customer->vip_card_type = $package['name'];
+        $customer->vip_card_balance += $package['price'] + $package['offer'];
+        $customer->vip_card_expires_at = isset($package['validity_years']) 
+            ? now()->addYears($package['validity_years']) 
+            : now()->addMonths($package['validity_months']);
         $customer->save();
 
-        // Create a log for this transaction for accounting
         CustomerLog::create([
-            'user_id' => Auth::id(),
-            'customer_id' => $customer->id,
-            'payment_method' => 'VIP Top-Up',
-            'payment_amount' => $validated['top_up_amount'],
-            'status' => 'completed',
-            'is_vip_top_up' => true,
-            'completed_at' => now()
+            'user_id' => Auth::id(), 'customer_id' => $customer->id,
+            'payment_method' => 'VIP Top-Up', 'payment_amount' => $package['price'],
+            'status' => 'completed', 'is_vip_top_up' => true, 'completed_at' => now()
         ]);
-        
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipBalanceTopUp($customer, $validated['top_up_amount']));
 
-          return redirect()->route('customers.show', $customer)->with('success', 'Balance updated successfully!');
+        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipBalanceTopUp($customer, $package['name']));
+
+        return redirect()->route('customers.show', $customer)->with('success', 'Balance updated successfully!');
     }
 }

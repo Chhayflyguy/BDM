@@ -24,19 +24,21 @@
                         </div>
                         <!-- vip card-->
                         <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <x-input-label for="vip_card_id" :value="__('VIP Card ID (Optional)')" />
-                                <x-text-input id="vip_card_id" class="block mt-1 w-full" type="text" name="vip_card_id" :value="old('vip_card_id')" />
-                            </div>
-                            <div>
-                                <x-input-label for="vip_card_balance" :value="__('Initial VIP Balance ($)')" />
-                                <x-text-input id="vip_card_balance" class="block mt-1 w-full" type="number" name="vip_card_balance" :value="old('vip_card_balance', 0)" step="0.01" />
-                            </div>
-                            <div class="mt-4">
-                                <x-input-label for="vip_card_expires_at" :value="__('VIP Card Expires At (Optional)')" />
-                                <x-text-input id="vip_card_expires_at" class="block mt-1 w-full" type="date" name="vip_card_expires_at" :value="old('vip_card_expires_at')" />
-                            </div>
-                        </div>
+    <div>
+        <x-input-label for="vip_card_id" :value="__('VIP Card ID (Optional)')" />
+        <x-text-input id="vip_card_id" class="block mt-1 w-full" type="text" name="vip_card_id" :value="old('vip_card_id')" />
+    </div>
+    <div>
+        <x-input-label for="vip_package" :value="__('VIP Package (Optional)')" />
+        <select name="vip_package" id="vip_package" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+            <option value="">None</option>
+            <option value="vip">VIP Card ($250 get $300)</option>
+            <option value="silver">Silver Card ($500 get $650)</option>
+            <option value="golden">Golden Card ($1000 get $1500)</option>
+            <option value="diamond">Diamond Card ($2000 get $3000)</option>
+        </select>
+    </div>
+</div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                             <!-- Gender -->

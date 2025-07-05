@@ -60,25 +60,23 @@
                 </div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Top Up VIP Balance</h3>
-                <form action="{{ route('customers.top-up', $customer) }}" method="POST">
-                    @csrf
-                    <div class="flex items-end space-x-4">
-                        <div>
-                            <x-input-label for="top_up_amount" :value="__('Amount ($)')" />
-                            <x-text-input id="top_up_amount" class="block mt-1" type="number" name="top_up_amount" step="0.01" required />
-                        </div>
-                        <div>
-                            <x-input-label for="vip_card_expires_at" :value="__('New Expiry Date (Optional)')" />
-                            <x-text-input id="vip_card_expires_at" class="block mt-1" type="date" name="vip_card_expires_at" />
-                        </div>
-                        <x-primary-button>Add Balance</x-primary-button>
-                    </div>
-                    @error('top_up_amount')
-                    <p class="text-sm text-red-600 mt-2">{{ $message }}</p>
-                    @enderror
-                </form>
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Top Up VIP Balance</h3>
+    <form action="{{ route('customers.top-up', $customer) }}" method="POST">
+        @csrf
+        <div class="flex items-end space-x-4">
+            <div>
+                <x-input-label for="vip_package" :value="__('Select Package')" />
+                <select name="vip_package" id="vip_package" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
+                    <option value="vip">VIP Card ($250 get $300)</option>
+                    <option value="silver">Silver Card ($500 get $650)</option>
+                    <option value="golden">Golden Card ($1000 get $1500)</option>
+                    <option value="diamond">Diamond Card ($2000 get $3000)</option>
+                </select>
             </div>
+            <x-primary-button>Top Up Balance</x-primary-button>
+        </div>
+    </form>
+</div>
             <!-- Log History Section -->
             <div class="bg-white p-6 rounded-lg shadow-sm">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Log History</h3>

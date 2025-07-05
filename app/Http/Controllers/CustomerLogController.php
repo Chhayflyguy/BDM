@@ -12,6 +12,8 @@ use Illuminate\Http\RedirectResponse;
 use App\Exports\CustomerLogsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use App\Notifications\VipPaymentMade;         // NEW: Import the notification class
+use Illuminate\Support\Facades\Notification;
 class CustomerLogController extends Controller
 {
     use AuthorizesRequests;
@@ -134,9 +136,11 @@ class CustomerLogController extends Controller
             if ($customer->vip_card_balance < $totalCost) {
                 return back()->withErrors(['balance' => 'Insufficient VIP card balance.'])->withInput();
             }
-            // Deduct from balance
             $customer->vip_card_balance -= $totalCost;
             $customer->save();
+            
+            // Trigger notification after saving
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipPaymentMade($customerLog));
         }
         
         $customer = $customerLog->customer;

@@ -9,14 +9,13 @@ use NotificationChannels\Telegram\TelegramMessage;
 class VipBalanceTopUp extends Notification
 {
     use Queueable;
-
     protected $customer;
-    protected $amount;
+    protected $packageName;
 
-    public function __construct($customer, $amount)
+    public function __construct($customer, $packageName)
     {
         $this->customer = $customer;
-        $this->amount = $amount;
+        $this->packageName = $packageName;
     }
 
     public function via($notifiable)
@@ -26,11 +25,16 @@ class VipBalanceTopUp extends Notification
 
     public function toTelegram($notifiable)
     {
-        $name = $this->customer->name;
-        $newBalance = number_format($this->customer->vip_card_balance, 2);
+        $c = $this->customer;
+        $newBalance = number_format($c->vip_card_balance, 2);
+        $expiryDate = $c->vip_card_expires_at ? $c->vip_card_expires_at->format('M d, Y') : 'N/A';
 
-        return TelegramMessage::create()
-            ->to(env('TELEGRAM_CHAT_ID'))
-            ->content("💰 *VIP Balance Top-Up* 💰\n\n*Customer:* {$name}\n*Amount Added:* \${$this->amount}\n*New Balance:* \${$newBalance}");
+        $message = "💰 *VIP Balance Top-Up* 💰\n\n";
+        $message .= "*Customer:* {$c->name}\n";
+        $message .= "*Package:* {$this->packageName}\n";
+        $message .= "*New Balance:* \${$newBalance}\n";
+        $message .= "*New Expiry Date:* {$expiryDate}";
+
+        return TelegramMessage::create()->to(env('TELEGRAM_CHAT_ID'))->content($message);
     }
 }

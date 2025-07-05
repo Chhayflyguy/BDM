@@ -14,7 +14,8 @@ class Customer extends Model
     protected $fillable = [
         'user_id',
         'customer_gid',
-        'vip_card_id',     
+        'vip_card_id', 
+        'vip_card_type', // NEW    
         'vip_card_balance', 
         'vip_card_expires_at',
         'next_booking_date', // NEW

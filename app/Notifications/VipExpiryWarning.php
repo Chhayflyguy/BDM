@@ -23,11 +23,16 @@ class VipExpiryWarning extends Notification
 
     public function toTelegram($notifiable)
     {
-        $name = $this->customer->name;
-        $expiryDate = $this->customer->vip_card_expires_at->format('M d, Y');
+        $c = $this->customer;
+        $expiryDate = $c->vip_card_expires_at->format('M d, Y');
+        $balance = number_format($c->vip_card_balance, 2);
 
-        return TelegramMessage::create()
-            ->to(env('TELEGRAM_CHAT_ID'))
-            ->content("⏳ *VIP Expiry Warning* ⏳\n\n*Customer:* {$name}\n*VIP Card Expires On:* {$expiryDate}");
+        $message = "⏳ *VIP Expiry Warning* ⏳\n\n";
+        $message .= "*Customer:* {$c->name}\n";
+        $message .= "*Phone:* {$c->phone}\n";
+        $message .= "*VIP Card Expires On:* {$expiryDate}\n";
+        $message .= "*Remaining Balance:* \${$balance}";
+
+        return TelegramMessage::create()->to(env('TELEGRAM_CHAT_ID'))->content($message);
     }
 }

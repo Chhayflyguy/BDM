@@ -24,12 +24,20 @@ class NewCustomerCreated extends Notification
 
     public function toTelegram($notifiable)
     {
-        $name = $this->customer->name;
-        $phone = $this->customer->phone ?? 'N/A';
-        $vipId = $this->customer->vip_card_id ? " (VIP ID: {$this->customer->vip_card_id})" : "";
+        $c = $this->customer;
+        $message = "✅ *New Customer Profile Created* ✅\n\n";
+        $message .= "*Name:* {$c->name}\n";
+        $message .= "*Phone:* {$c->phone}\n";
+        $message .= "*Gender:* {$c->gender}\n";
+        $message .= "*Age:* {$c->age}\n\n";
 
-        return TelegramMessage::create()
-            ->to(env('TELEGRAM_CHAT_ID'))
-            ->content("✅ *New Customer Created* ✅\n\n*Name:* {$name}{$vipId}\n*Phone:* {$phone}");
+        if ($c->vip_card_id) {
+            $message .= "*VIP Card ID:* {$c->vip_card_id}\n";
+            $message .= "*Package:* {$c->vip_card_type}\n";
+            $message .= "*Initial Balance:* $" . number_format($c->vip_card_balance, 2) . "\n";
+            $message .= "*Expires On:* " . ($c->vip_card_expires_at ? $c->vip_card_expires_at->format('M d, Y') : 'N/A') . "\n";
+        }
+
+        return TelegramMessage::create()->to(env('TELEGRAM_CHAT_ID'))->content($message);
     }
 }
