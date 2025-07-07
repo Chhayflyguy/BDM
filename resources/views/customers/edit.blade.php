@@ -72,13 +72,13 @@
                             <h3 class="text-lg font-medium text-gray-900 mb-2">VIP Details</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <x-input-label for="vip_card_id" :value="__('VIP Card ID')" />
+                                    <x-input-label for="vip_card_id" :value="__('Balance Card ID')" />
                                     <x-text-input id="vip_card_id" class="block mt-1 w-full" type="text" name="vip_card_id" :value="old('vip_card_id', $customer->vip_card_id)" />
                                 </div>
 
                                 {{-- THIS IS THE NEW FIELD TO ADD --}}
                                 <div>
-                                    <x-input-label for="vip_card_expires_at" :value="__('VIP Card Expires At')" />
+                                    <x-input-label for="vip_card_expires_at" :value="__('Balance Card Expires At')" />
                                     <x-text-input id="vip_card_expires_at" class="block mt-1 w-full" type="date" name="vip_card_expires_at" :value="old('vip_card_expires_at', $customer->vip_card_expires_at?->format('Y-m-d'))" />
                                 </div>
                             </div>

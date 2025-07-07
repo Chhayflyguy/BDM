@@ -26,9 +26,16 @@
                     <div><span class="font-medium text-gray-500">Age:</span> {{ $customer->age ?? 'N/A' }}</div>
                     <div><span class="font-medium text-gray-500">Height:</span> {{ $customer->height ?? 'N/A' }}</div>
                     <div><span class="font-medium text-gray-500">Weight:</span> {{ $customer->weight ?? 'N/A' }}</div>
-                    <div><span class="font-medium text-gray-500">VIP Card ID:</span> {{ $customer->vip_card_id ?? 'N/A' }}</div>
-                    <div><span class="font-medium text-gray-500">VIP Balance:</span> <span class="font-bold text-blue-600">${{ number_format($customer->vip_card_balance, 2) }}</span></div>
-                    <div><span class="font-medium text-gray-500">VIP Expires:</span> {{ $customer->vip_card_expires_at?->format('F j, Y') ?? 'N/A' }}</div>
+                    <div><span class="font-medium text-gray-500">Balance Card ID:</span> {{ $customer->vip_card_id ?? 'N/A' }}</div>
+                    <div>
+                        @php
+                        // Use the customer's card type for the label, or default to "VIP Balance"
+                        $balanceLabel = $customer->vip_card_type ? $customer->vip_card_type . ' Balance' : 'VIP Balance';
+                        @endphp
+                        <span class="font-medium text-gray-500">{{ $balanceLabel }}:</span>
+                        <span class="font-bold text-blue-600">${{ number_format($customer->vip_card_balance, 2) }}</span>
+                    </div>
+                    <div><span class="font-medium text-gray-500">Balance Expired:</span> {{ $customer->vip_card_expires_at?->format('F j, Y') ?? 'N/A' }}</div>
                     <div>
                         <span class="font-medium text-gray-500">Next Booking:</span>
                         @if($customer->next_booking_date)
@@ -60,23 +67,23 @@
                 </div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm">
-    <h3 class="text-lg font-medium text-gray-900 mb-4">Top Up VIP Balance</h3>
-    <form action="{{ route('customers.top-up', $customer) }}" method="POST">
-        @csrf
-        <div class="flex items-end space-x-4">
-            <div>
-                <x-input-label for="vip_package" :value="__('Select Package')" />
-                <select name="vip_package" id="vip_package" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
-                    <option value="vip">VIP Card ($250 get $300)</option>
-                    <option value="silver">Silver Card ($500 get $650)</option>
-                    <option value="golden">Golden Card ($1000 get $1500)</option>
-                    <option value="diamond">Diamond Card ($2000 get $3000)</option>
-                </select>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Top Up VIP Balance</h3>
+                <form action="{{ route('customers.top-up', $customer) }}" method="POST">
+                    @csrf
+                    <div class="flex items-end space-x-4">
+                        <div>
+                            <x-input-label for="vip_package" :value="__('Select Package')" />
+                            <select name="vip_package" id="vip_package" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
+                                <option value="vip">VIP Card ($250 get $300)</option>
+                                <option value="silver">Silver Card ($500 get $650)</option>
+                                <option value="golden">Golden Card ($1000 get $1500)</option>
+                                <option value="diamond">Diamond Card ($2000 get $3000)</option>
+                            </select>
+                        </div>
+                        <x-primary-button>Top Up Balance</x-primary-button>
+                    </div>
+                </form>
             </div>
-            <x-primary-button>Top Up Balance</x-primary-button>
-        </div>
-    </form>
-</div>
             <!-- Log History Section -->
             <div class="bg-white p-6 rounded-lg shadow-sm">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Log History</h3>

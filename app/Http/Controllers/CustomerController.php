@@ -51,8 +51,8 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'vip_card_id' => ['nullable', 'string', 'max:255', Rule::unique('customers', 'vip_card_id')],
             'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
+            'vip_card_number' => ['nullable', 'string', 'max:255'], // We'll validate the number part
             'gender' => 'nullable|in:Male,Female,Other',
             'age' => 'nullable|integer|min:0',
             'height' => 'nullable|string|max:10',
@@ -60,6 +60,20 @@ class CustomerController extends Controller
             'health_conditions' => 'nullable|array',
             'problem_areas' => 'nullable|array',
         ]);
+
+        $fullVipCardId = null;
+        if (!empty($validated['vip_package']) && !empty($validated['vip_card_number'])) {
+            $prefix = strtoupper(substr($validated['vip_package'], 0, 1)); // V, S, G, D
+            $fullVipCardId = $prefix . $validated['vip_card_number'];
+
+            // Now validate the uniqueness of the full ID
+            $request->validate([
+                'vip_card_id_full' => Rule::unique('customers', 'vip_card_id')
+            ], ['vip_card_id_full.unique' => 'This VIP Card ID is already taken.']);
+            
+            $validated['vip_card_id'] = $fullVipCardId;
+        }
+        
         do {
             $customerGid = random_int(100000, 999999);
         } while (Customer::where('customer_gid', $customerGid)->exists());
