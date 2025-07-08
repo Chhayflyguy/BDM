@@ -5,28 +5,37 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <form action="{{ route('payroll.index') }}" method="GET" class="flex items-end space-x-4">
-                    <div>
-                        <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
-                        <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
-                            @foreach($months as $num => $name)
-                                <option value="{{ $num }}" @selected($num == $currentMonth)>{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                        <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
-                            @foreach($years as $year)
-                                <option value="{{ $year }}" @selected($year == $currentYear)>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <x-primary-button>Generate Report</x-primary-button>
-                </form>
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                <div class="flex justify-between items-end">
+                    <!-- Filter Form -->
+                    <form action="{{ route('payroll.index') }}" method="GET" class="flex items-end space-x-4">
+                        <div>
+                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($months as $num => $name)
+                                    <option value="{{ $num }}" @selected($num == $currentMonth)>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($years as $year)
+                                    <option value="{{ $year }}" @selected($year == $currentYear)>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <x-primary-button>Generate Report</x-primary-button>
+                    </form>
+                    <!-- Export Form -->
+                    <form action="{{ route('payroll.export') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="month" value="{{ $currentMonth }}">
+                        <input type="hidden" name="year" value="{{ $currentYear }}">
+                        <x-secondary-button type="submit">Export to Excel</x-secondary-button>
+                    </form>
+                </div>
             </div>
-            
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">

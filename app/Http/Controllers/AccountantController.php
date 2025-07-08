@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use App\Exports\AccountantReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AccountantController extends Controller
 {
@@ -59,5 +61,33 @@ class AccountantController extends Controller
             'totalIncome', 'incomeByPaymentMethod', 'totalExpenses', 'totalSalaries', 'netProfit', 
             'months', 'years', 'currentMonth', 'currentYear'
         ));
+    }
+
+    //export
+    public function export(Request $request)
+    {
+        $request->validate(['month' => 'required', 'year' => 'required']);
+        
+        // We reuse the logic from the index method to get the data
+        $data = $this->getAccountantData($request->month, $request->year);
+        
+        $reportData = [
+            ['Gross Income', $data['totalIncome']],
+            ['Total Daily Expenses', $data['totalExpenses']],
+            ['Total Employee Payroll', $data['totalSalaries']],
+            ['Net Profit', $data['netProfit']],
+        ];
+
+        $fileName = 'Accountant-Report-' . $request->year . '-' . $request->month . '.xlsx';
+        return Excel::download(new AccountantReportExport($reportData), $fileName);
+    }
+    private function getAccountantData($month, $year)
+    {
+        $data = [];
+        $data['totalIncome'] = CustomerLog::where('user_id', Auth::id())->where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->where(function ($q) { $q->where('is_vip_top_up', true)->orWhere('payment_method', '!=', 'VIP Card'); })->sum('payment_amount');
+        $data['totalExpenses'] = DailyExpense::where('user_id', Auth::id())->whereYear('expense_date', $year)->whereMonth('expense_date', $month)->sum('amount');
+        $data['totalSalaries'] = CustomerLog::where('user_id', Auth::id())->where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->sum('employee_commission');
+        $data['netProfit'] = $data['totalIncome'] - $data['totalExpenses'] - $data['totalSalaries'];
+        return $data;
     }
 }

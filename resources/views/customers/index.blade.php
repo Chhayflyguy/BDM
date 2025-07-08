@@ -1,33 +1,51 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('All Customers') }}
-            </h2>
-            <a href="{{ route('customers.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                {{ __('Add New Customer') }}
-            </a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('All Customers') }}</h2>
+            <a href="{{ route('customers.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">{{ __('Add New Customer') }}</a>
         </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Search Form -->
             <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <form action="{{ route('customers.index') }}" method="GET">
-                    <div class="flex items-center">
-                        <x-text-input id="search" name="search" type="text" class="block w-full" placeholder="Search by name, ID, or phone..." :value="request('search')" />
-                        <x-primary-button class="ms-3">
-                            {{ __('Search') }}
-                        </x-primary-button>
-                    </div>
-                </form>
+                <div class="flex justify-between items-end">
+                    <!-- Filter and Search Form -->
+                    <form action="{{ route('customers.index') }}" method="GET" class="flex items-end space-x-4">
+                        <div>
+                            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                            <x-text-input id="search" name="search" type="text" class="mt-1 block" placeholder="Name, ID, phone..." :value="request('search')" />
+                        </div>
+                        <div>
+                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($months as $num => $name)
+                                <option value="{{ $num }}" @selected($num==$currentMonth)>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($years as $year)
+                                <option value="{{ $year }}" @selected($year==$currentYear)>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <x-primary-button>Filter</x-primary-button>
+                    </form>
+                    <!-- Export Form -->
+                    <form action="{{ route('customers.export') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="month" value="{{ $currentMonth }}">
+                        <input type="hidden" name="year" value="{{ $currentYear }}">
+                        <x-secondary-button type="submit">Export to Excel</x-secondary-button>
+                    </form>
+                </div>
             </div>
-
+            
             @if (session('success'))
-            <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-200 rounded-md shadow-sm">
-                {{ session('success') }}
-            </div>
+                <div class="mb-4 p-4 bg-green-100 text-green-700 border rounded-md shadow-sm">{{ session('success') }}</div>
             @endif
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -58,7 +76,6 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $customer->gender ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $customer->age ?? 'N/A' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{-- THIS IS THE FIX: Manually parse the date string --}}
                                     @if($customer->next_booking_date)
                                     {{ \Carbon\Carbon::parse($customer->next_booking_date)->format('M d, Y') }}
                                     @else
@@ -68,15 +85,14 @@
                             </tr>
                             @empty
                             <tr>
-                                {{-- MODIFIED: Ensure colspan matches the new number of columns --}}
-                                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No customers found.</td>
+                                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No new customers found for this month.</td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="p-4">
-                    {{ $customers->links() }}
+                    {{ $customers->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>

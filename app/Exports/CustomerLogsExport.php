@@ -3,10 +3,10 @@
 namespace App\Exports;
 
 use App\Models\CustomerLog;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Support\Facades\Auth;
 
 class CustomerLogsExport implements FromCollection, WithHeadings, WithMapping
 {
@@ -19,59 +19,71 @@ class CustomerLogsExport implements FromCollection, WithHeadings, WithMapping
         $this->month = $month;
     }
 
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
-        return CustomerLog::whereYear('created_at', $this->year)
-            ->whereMonth('created_at', $this->month)
-            ->where('user_id', Auth::id()) // <-- CHANGE THIS LINE
+        return CustomerLog::with(['customer', 'employee'])
+            ->where('user_id', Auth::user()->id)
+            ->whereYear('completed_at', $this->year)
+            ->whereMonth('completed_at', $this->month)
+            ->where('status', 'completed')
             ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
+        // A comprehensive list of all possible columns
         return [
-            'Date Created',
+            'Date',
+            'Log Type',
             'Customer ID',
             'Customer Name',
-            'Customer Phone',
-            'Consultant',
-            'Product Purchased',
-            'Product Price',
+            'Phone',
             'Masseuse Name',
             'Massage Price',
+            'Product Name',
+            'Product Price',
+            'Payment Method',
             'Total Payment',
-            'Status',
-            'Date Completed',
-            'Notes',
+            'Card Balance ID',
+            'Card Package',
         ];
     }
 
-    /**
-     * @var CustomerLog $log
-     * @return array
-     */
     public function map($log): array
     {
-        return [
-            $log->created_at->format('Y-m-d'),
-            $log->customer_gid,
-            $log->customer_name,
-            $log->customer_phone,
-            $log->user->name, // Consultant Name
-            $log->product_purchased,
-            $log->product_price,
-            $log->masseuse_name,
-            $log->massage_price,
-            $log->payment_amount,
-            $log->status,
-            $log->completed_at ? $log->completed_at->format('Y-m-d H:i') : 'N/A',
-            $log->notes,
-        ];
+        // Conditional mapping based on log type
+        if ($log->is_vip_top_up) {
+            return [
+                $log->completed_at->format('Y-m-d'),
+                'VIP Top-Up',
+                $log->customer->customer_gid ?? 'N/A',
+                $log->customer->name ?? 'N/A',
+                $log->customer->phone ?? 'N/A',
+                null, // Masseuse Name
+                null, // Massage Price
+                null, // Product Name
+                null, // Product Price
+                'VIP Top-Up', // Payment Method
+                $log->payment_amount, // Total Payment (the top-up amount)
+                $log->customer->vip_card_id ?? 'N/A',
+                $log->customer->vip_card_type ?? 'N/A',
+            ];
+        } else {
+            return [
+                $log->completed_at->format('Y-m-d'),
+                'Service/Sale',
+                $log->customer->customer_gid ?? 'N/A',
+                $log->customer->name ?? 'N/A',
+                $log->customer->phone ?? 'N/A',
+                $log->masseuse_name,
+                $log->massage_price,
+                $log->product_purchased,
+                $log->product_price,
+                $log->payment_method,
+                $log->payment_amount,
+                null, // Card Balance ID
+                null, // Card Package
+            ];
+        }
     }
 }

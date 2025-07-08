@@ -6,6 +6,8 @@ use App\Models\DailyExpense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use App\Exports\DailyExpensesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DailyExpenseController extends Controller
 {
@@ -56,5 +58,13 @@ class DailyExpenseController extends Controller
         DailyExpense::create($validated);
 
         return redirect()->route('daily_expenses.index')->with('success', 'Expense recorded successfully!');
+    }
+
+    //export
+    public function export(Request $request)
+    {
+        $request->validate(['month' => 'required', 'year' => 'required']);
+        $fileName = 'Expenses-' . $request->year . '-' . $request->month . '.xlsx';
+        return Excel::download(new DailyExpensesExport($request->year, $request->month), $fileName);
     }
 }

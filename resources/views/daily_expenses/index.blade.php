@@ -8,26 +8,36 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <form action="{{ route('daily_expenses.index') }}" method="GET" class="flex items-end space-x-4">
-                    <div>
-                        <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
-                        <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
-                            @foreach($months as $num => $name)
-                                <option value="{{ $num }}" @selected($num == $currentMonth)>{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
-                        <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
-                            @foreach($years as $year)
-                                <option value="{{ $year }}" @selected($year == $currentYear)>{{ $year }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <x-primary-button>Filter</x-primary-button>
-                </form>
+        <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                <div class="flex justify-between items-end">
+                    <!-- Filter Form -->
+                    <form action="{{ route('daily_expenses.index') }}" method="GET" class="flex items-end space-x-4">
+                        <div>
+                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($months as $num => $name)
+                                <option value="{{ $num }}" @selected($num==$currentMonth)>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
+                                @foreach($years as $year)
+                                <option value="{{ $year }}" @selected($year==$currentYear)>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <x-primary-button>Filter</x-primary-button>
+                    </form>
+                    <!-- Export Form -->
+                    <form action="{{ route('daily_expenses.export') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="month" value="{{ $currentMonth }}">
+                        <input type="hidden" name="year" value="{{ $currentYear }}">
+                        <x-secondary-button type="submit">Export to Excel</x-secondary-button>
+                    </form>
+                </div>
             </div>
 
             <div class="bg-white p-6 rounded-lg shadow-sm mb-8 text-center">
@@ -36,32 +46,32 @@
             </div>
 
             @if (session('success'))
-                <div class="mb-4 p-4 bg-green-100 text-green-700 border rounded-md shadow-sm">{{ session('success') }}</div>
+            <div class="mb-4 p-4 bg-green-100 text-green-700 border rounded-md shadow-sm">{{ session('success') }}</div>
             @endif
 
             @forelse ($groupedExpenses as $date => $expenses)
-                <div class="mt-8">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">{{ \Carbon\Carbon::parse($date)->format('F j, Y') }}</h3>
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($expenses as $expense)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $expense->item_name }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $expense->purpose }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-semibold">${{ number_format($expense->amount, 2) }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="mt-8">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">{{ \Carbon\Carbon::parse($date)->format('F j, Y') }}</h3>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach ($expenses as $expense)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $expense->item_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $expense->purpose }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-semibold">${{ number_format($expense->amount, 2) }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
             @empty
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-8">
-                    <div class="p-6 text-gray-900 text-center">No expenses recorded for this month.</div>
-                </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-8">
+                <div class="p-6 text-gray-900 text-center">No expenses recorded for this month.</div>
+            </div>
             @endforelse
         </div>
     </div>

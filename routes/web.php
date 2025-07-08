@@ -41,6 +41,12 @@ Route::middleware('auth')->group(function () {
     // Route::post('/reset-password/questions', [SecurityQuestionResetController::class, 'verifyQuestions'])->middleware('guest')->name('password.questions.verify');
     // Route::get('/reset-password/new', [SecurityQuestionResetController::class, 'showNewPasswordForm'])->middleware('guest')->name('password.reset');
     // Route::post('/reset-password/new', [SecurityQuestionResetController::class, 'updatePassword'])->middleware('guest')->name('password.update');
+
+    // Export Routes
+    Route::post('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
+    Route::post('/daily_expenses/export', [DailyExpenseController::class, 'export'])->name('daily_expenses.export');
+    Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export');
+    Route::post('/accountant/export', [AccountantController::class, 'export'])->name('accountant.export');
 });
 
 require __DIR__ . '/auth.php';

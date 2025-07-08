@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\PayrollExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollController extends Controller
 {
@@ -38,5 +40,12 @@ class PayrollController extends Controller
         return view('payroll.index', compact(
             'payrolls', 'months', 'years', 'currentMonth', 'currentYear'
         ));
+    }
+    //export
+    public function export(Request $request)
+    {
+        $request->validate(['month' => 'required', 'year' => 'required']);
+        $fileName = 'Payroll-' . $request->year . '-' . $request->month . '.xlsx';
+        return Excel::download(new PayrollExport($request->year, $request->month), $fileName);
     }
 }
