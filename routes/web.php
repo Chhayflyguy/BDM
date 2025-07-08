@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/profile/security-questions', [ProfileController::class, 'storeSecurityQuestions'])->name('profile.security-questions.store');
+    Route::post('/profile/security-questions', [ProfileController::class, 'storeSecurityQuestions'])->name('profile.security-questions.store')->middleware('password.confirm');
     // Completion workflow routes
     Route::post('/customers/{customer}/top-up', [CustomerController::class, 'topUpVipBalance'])->name('customers.top-up'); // NEW
     Route::get('/customer_logs/{customerLog}/complete', [CustomerLogController::class, 'showCompletionForm'])->name('customer_logs.complete.form');

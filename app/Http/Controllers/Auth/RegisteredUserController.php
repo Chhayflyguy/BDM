@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\SecurityQuestion;
 
 class RegisteredUserController extends Controller
 {
@@ -33,12 +34,26 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            // Add validation for security questions
+            'question_1' => ['required', 'string', 'different:question_2'],
+            'answer_1' => ['required', 'string', 'min:3'],
+            'question_2' => ['required', 'string', 'different:question_1'],
+            'answer_2' => ['required', 'string', 'min:3'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+        
+        // Save the security questions for the new user
+        SecurityQuestion::create([
+            'user_id' => $user->id,
+            'question_1' => $request->question_1,
+            'answer_1' => $request->answer_1,
+            'question_2' => $request->question_2,
+            'answer_2' => $request->answer_2,
         ]);
 
         event(new Registered($user));

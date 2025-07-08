@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-    Route::put('password', [PasswordController::class, 'update']); // Note: password.update is now used for changing password in profile
+    Route::put('password', [PasswordController::class, 'update'])->name('password.profile.update');// Note: password.update is now used for changing password in profile
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
