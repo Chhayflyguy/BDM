@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('All Customers') }}</h2>
-            <a href="{{ route('customers.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">{{ __('Add New Customer') }}</a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('messages.all_customers') }}</h2>
+            <a href="{{ route('customers.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">{{ __('messages.add_new_customer') }}</a>
         </div>
     </x-slot>
 
@@ -13,11 +13,11 @@
                     <!-- Filter and Search Form -->
                     <form action="{{ route('customers.index') }}" method="GET" class="flex items-end space-x-4">
                         <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                            <label for="search" class="block text-sm font-medium text-gray-700">{{ __('messages.search') }}</label>
                             <x-text-input id="search" name="search" type="text" class="mt-1 block" placeholder="Name, ID, phone..." :value="request('search')" />
                         </div>
                         <div>
-                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <label for="month" class="block text-sm font-medium text-gray-700">{{ __('messages.month') }}</label>
                             <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
                                 @foreach($months as $num => $name)
                                 <option value="{{ $num }}" @selected($num==$currentMonth)>{{ $name }}</option>
@@ -25,21 +25,21 @@
                             </select>
                         </div>
                         <div>
-                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <label for="year" class="block text-sm font-medium text-gray-700">{{ __('messages.year') }}</label>
                             <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
                                 @foreach($years as $year)
                                 <option value="{{ $year }}" @selected($year==$currentYear)>{{ $year }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <x-primary-button>Filter</x-primary-button>
+                        <x-primary-button>{{ __('messages.filter') }}</x-primary-button>
                     </form>
                     <!-- Export Form -->
                     <form action="{{ route('customers.export') }}" method="POST">
                         @csrf
                         <input type="hidden" name="month" value="{{ $currentMonth }}">
                         <input type="hidden" name="year" value="{{ $currentYear }}">
-                        <x-secondary-button type="submit">Export to Excel</x-secondary-button>
+                        <x-secondary-button type="submit">{{ __('messages.export_to_excel') }}</x-secondary-button>
                     </form>
                 </div>
             </div>
@@ -53,13 +53,13 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">VIP ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gender</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Booking</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.id') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.vip_id') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.name') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.phone') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.gender') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.age') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.next_booking') }}</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -85,7 +85,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No new customers found for this month.</td>
+                                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ __('messages.no_new_customers_found_for_this_month') }}</td>
                             </tr>
                             @endforelse
                         </tbody>

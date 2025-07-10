@@ -2,10 +2,10 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Customer Profile: <span class="font-bold">{{ $customer->name }}</span>
+                {{ __('messages.customer_profile') }}: <span class="font-bold">{{ $customer->name }}</span>
             </h2>
             <a href="{{ route('customers.edit', $customer) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                {{ __('Edit Profile') }}
+                {{ __('messages.edit_profile') }}
             </a>
         </div>
     </x-slot>
@@ -58,45 +58,45 @@
                 </div>
                 <hr class="my-6">
                 <div>
-                    <h4 class="font-medium text-gray-600 mb-2">Health Conditions</h4>
+                    <h4 class="font-medium text-gray-600 mb-2">{{ __('messages.health_conditions') }}</h4>
                     <p class="text-gray-800">{{ $customer->health_conditions ? implode(', ', $customer->health_conditions) : 'None' }}</p>
                 </div>
                 <div class="mt-4">
-                    <h4 class="font-medium text-gray-600 mb-2">Problem Areas</h4>
+                    <h4 class="font-medium text-gray-600 mb-2">{{ __('messages.problem_areas') }}</h4>
                     <p class="text-gray-800">{{ $customer->problem_areas ? implode(', ', $customer->problem_areas) : 'None' }}</p>
                 </div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Top Up VIP Balance</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('messages.top_up_vip_balance') }}</h3>
                 <form action="{{ route('customers.top-up', $customer) }}" method="POST">
                     @csrf
                     <div class="flex items-end space-x-4">
                         <div>
-                            <x-input-label for="vip_package" :value="__('Select Package')" />
+                            <x-input-label for="vip_package" :value="__('messages.select_package')" />
                             <select name="vip_package" id="vip_package" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" required>
-                                <option value="vip">VIP Card ($250 get $300)</option>
-                                <option value="silver">Silver Card ($500 get $650)</option>
-                                <option value="golden">Golden Card ($1000 get $1500)</option>
-                                <option value="diamond">Diamond Card ($2000 get $3000)</option>
+                                <option value="vip">{{ __('messages.vip_card_250_300') }}</option>
+                                <option value="silver">{{ __('messages.silver_card_500_650') }}</option>
+                                <option value="golden">{{ __('messages.golden_card_1000_1500') }}</option>
+                                <option value="diamond">{{ __('messages.diamond_card_2000_3000') }}</option>
                             </select>
                         </div>
-                        <x-primary-button>Top Up Balance</x-primary-button>
+                        <x-primary-button>{{ __('messages.top_up_balance') }}</x-primary-button>
                     </div>
                 </form>
             </div>
             <!-- Log History Section -->
             <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Log History</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('messages.log_history') }}</h3>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Masseuse</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.date') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.product') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.masseuse') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.payment') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.method') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.status') }}</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -115,15 +115,15 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                                     @if ($log->status === 'completed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ __('messages.completed') }}</span>
                                     @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Active</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ __('messages.active') }}</span>
                                     @endif
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No logs found for this customer.</td>
+                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ __('messages.no_logs_found_for_this_customer') }}</td>
                             </tr>
                             @endforelse
                         </tbody>

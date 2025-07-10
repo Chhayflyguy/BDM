@@ -2,10 +2,10 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Daily Customer Logs') }}
+                {{ __('messages.daily_customer_logs') }}
             </h2>
             <a href="{{ route('customer_logs.create') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                {{ __('Add New Log') }}
+                {{ __('messages.add_new_log') }}
             </a>
         </div>
     </x-slot>
@@ -13,11 +13,11 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Export Monthly Report</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('messages.export_monthly_report') }}</h3>
                 <form action="{{ route('customer_logs.export') }}" method="POST" class="flex items-end space-x-4">
                     @csrf
                     <div>
-                        <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                        <label for="month" class="block text-sm font-medium text-gray-700">{{ __('messages.month') }}</label>
                         <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             @foreach($months as $num => $name)
                             <option value="{{ $num }}" {{ $num == date('m') ? 'selected' : '' }}>{{ $name }}</option>
@@ -25,14 +25,14 @@
                         </select>
                     </div>
                     <div>
-                        <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                        <label for="year" class="block text-sm font-medium text-gray-700">{{ __('messages.year') }}</label>
                         <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             @foreach($years as $year)
                             <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <x-primary-button>Export to Excel</x-primary-button>
+                    <x-primary-button>{{ __('messages.export_to_excel') }}</x-primary-button>
                 </form>
             </div>
 
@@ -50,13 +50,13 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Masseuse</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.customer') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.product') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.masseuse') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.payment') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.method') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.status') }}</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -67,7 +67,7 @@
                                         <a href="{{ route('customers.show', $log->customer) }}" class="text-indigo-600 hover:text-indigo-900">{{ $log->customer->name }}</a>
                                         <div class="text-xs text-gray-500">ID: {{ $log->customer->customer_gid }}</div>
                                         @else
-                                        <span class="text-red-500">Customer Deleted</span>
+                                        <span class="text-red-500">{{ __('messages.customer_deleted') }}</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $log->product_purchased ?? '-' }}</td>
@@ -83,22 +83,22 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $log->payment_method ?? '-' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         @if ($log->status === 'completed')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Completed</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{{ __('messages.completed') }}</span>
                                         @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Active</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ __('messages.active') }}</span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         @if ($log->status === 'active')
-                                        <a href="{{ route('customer_logs.complete.form', $log) }}" class="text-green-600 hover:text-green-900 mr-4 font-bold">Complete</a>
-                                        <a href="{{ route('customer_logs.edit', $log) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                                        <a href="{{ route('customer_logs.complete.form', $log) }}" class="text-green-600 hover:text-green-900 mr-4 font-bold">{{ __('messages.complete') }}</a>
+                                        <a href="{{ route('customer_logs.edit', $log) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">{{ __('messages.edit') }}</a>
                                         <form action="{{ route('customer_logs.destroy', $log) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this log?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                            <button type="submit" class="text-red-600 hover:text-red-900">{{ __('messages.delete') }}</button>
                                         </form>
                                         @else
-                                        <span class="text-gray-400">Closed</span>
+                                        <span class="text-gray-400">{{ __('messages.closed') }}</span>
                                         @endif
                                     </td>
                                 </tr>

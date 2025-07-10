@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Add New Log for an Existing Customer') }}
+            {{ __('messages.add_new_log_for_existing_customer') }}
         </h2>
     </x-slot>
 
@@ -10,10 +10,10 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="mb-4">
-                        If the customer is not in the list, you must first <a href="{{ route('customers.create') }}" class="text-indigo-600 hover:underline">add a new customer profile</a>.
+                        {{ __('messages.if_customer_not_in_list') }} <a href="{{ route('customers.create') }}" class="text-indigo-600 hover:underline">{{ __('messages.add_new_customer_profile') }}</a>.
                     </div>
                     <form method="POST" action="{{ route('customer_logs.store') }}">
-                        @csrf
+                        @csrf   
 
                         <!-- Customer -->
                         <div>
@@ -28,7 +28,7 @@
                         </div>
                         <!-- Next Meeting -->
                         <div class="mt-4">
-                            <x-input-label for="next_meeting" :value="__('Date (Optional)')" />
+                            <x-input-label for="next_meeting" :value="__('messages.date_optional')" />
                             <x-text-input id="next_meeting" class="block mt-1 w-full" type="date" name="next_meeting" :value="old('next_meeting')" />
                         </div>
 
@@ -40,10 +40,10 @@
 
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">
-                                {{ __('Cancel') }}
+                                {{ __('messages.cancel') }}
                             </a>
                             <x-primary-button>
-                                {{ __('Create Log') }}
+                                {{ __('messages.create_log') }}
                             </x-primary-button>
                         </div>
                     </form>

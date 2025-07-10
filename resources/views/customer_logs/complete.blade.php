@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Complete Log for: ') }} <span class="font-bold">{{ $customerLog->customer->name }}</span>
+            {{ __('messages.complete_log_for') }} <span class="font-bold">{{ $customerLog->customer->name }}</span>
         </h2>
     </x-slot>
     <div class="py-12">
@@ -52,8 +52,8 @@
                         @endif
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">{{ __('Cancel') }}</a>
-                            <x-primary-button>{{ __('Mark as Complete') }}</x-primary-button>
+                            <a href="{{ route('dashboard') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">{{ __('messages.cancel') }}</a>
+                            <x-primary-button>{{ __('messages.mark_as_complete') }}</x-primary-button>
                         </div>
                     </form>
                 </div>

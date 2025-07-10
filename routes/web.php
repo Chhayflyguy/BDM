@@ -9,9 +9,9 @@ use App\Http\Controllers\AccountantController; // NEW
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PayrollController; // NEW
 use App\Http\Controllers\Auth\SecurityQuestionResetController;
-
+use App\Http\Controllers\LanguageController;
 // ...
-
+Route::get('language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 Route::get('/dashboard', [CustomerLogController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

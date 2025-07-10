@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Add New Employee') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('messages.add_new_employee') }}</h2>
     </x-slot>
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
@@ -10,19 +10,19 @@
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <x-input-label for="name" :value="__('Employee Name')" />
+                                <x-input-label for="name" :value="__('messages.employee_name')" />
                                 <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
                             </div>
                             <div>
-                                <x-input-label for="phone" :value="__('Phone Number')" />
+                                <x-input-label for="phone" :value="__('messages.phone_number')" />
                                 <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" />
                             </div>
                             <div>
-                                <x-input-label for="email" :value="__('Email (Optional)')" />
+                                <x-input-label for="email" :value="__('messages.email_optional')" />
                                 <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" />
                             </div>
                             <div>
-                                <x-input-label for="gender" :value="__('Gender')" />
+                                <x-input-label for="gender" :value="__('messages.gender')" />
                                 <select name="gender" id="gender" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
                                     <option value="">Select...</option>
                                     <option value="Male" @selected(old('gender') == 'Male')>Male</option>
@@ -31,17 +31,17 @@
                                 </select>
                             </div>
                             <div class="md:col-span-2">
-                                <x-input-label for="address" :value="__('Address (Optional)')" />
+                                <x-input-label for="address" :value="__('messages.address_optional')" />
                                 <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" :value="old('address')" />
                             </div>
                             <div class="md:col-span-2">
-                                <x-input-label for="experience" :value="__('Experience / Notes (Optional)')" />
+                                <x-input-label for="experience" :value="__('messages.experience_optional')" />
                                 <textarea id="experience" name="experience" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ old('experience') }}</textarea>
                             </div>
                         </div>
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('employees.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">{{ __('Cancel') }}</a>
-                            <x-primary-button>{{ __('Save Employee') }}</x-primary-button>
+                            <a href="{{ route('employees.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">{{ __('messages.cancel') }}</a>
+                            <x-primary-button>{{ __('messages.save_employee') }}</x-primary-button>
                         </div>
                     </form>
                 </div>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Employee Payroll') }}</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('messages.employee_payroll') }}</h2>
     </x-slot>
 
     <div class="py-12">
@@ -10,7 +10,7 @@
                     <!-- Filter Form -->
                     <form action="{{ route('payroll.index') }}" method="GET" class="flex items-end space-x-4">
                         <div>
-                            <label for="month" class="block text-sm font-medium text-gray-700">Month</label>
+                            <label for="month" class="block text-sm font-medium text-gray-700">{{ __('messages.month') }}</label>
                             <select id="month" name="month" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
                                 @foreach($months as $num => $name)
                                     <option value="{{ $num }}" @selected($num == $currentMonth)>{{ $name }}</option>
@@ -18,21 +18,21 @@
                             </select>
                         </div>
                         <div>
-                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <label for="year" class="block text-sm font-medium text-gray-700">{{ __('messages.year') }}</label>
                             <select id="year" name="year" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
                                 @foreach($years as $year)
                                     <option value="{{ $year }}" @selected($year == $currentYear)>{{ $year }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <x-primary-button>Generate Report</x-primary-button>
+                        <x-primary-button>{{ __('messages.generate_report') }}</x-primary-button>
                     </form>
                     <!-- Export Form -->
                     <form action="{{ route('payroll.export') }}" method="POST">
                         @csrf
                         <input type="hidden" name="month" value="{{ $currentMonth }}">
                         <input type="hidden" name="year" value="{{ $currentYear }}">
-                        <x-secondary-button type="submit">Export to Excel</x-secondary-button>
+                        <x-secondary-button type="submit">{{ __('messages.export_to_excel') }}</x-secondary-button>
                     </form>
                 </div>
             </div>
@@ -41,10 +41,10 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Services Rendered</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Salary</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.employee_id') }}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.name') }}</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.services_rendered') }}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.total_salary') }}</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -57,7 +57,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No payroll data for this month.</td>
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{{ __('messages.no_payroll_data_for_this_month') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
