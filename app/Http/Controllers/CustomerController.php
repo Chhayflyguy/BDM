@@ -13,6 +13,7 @@ use App\Notifications\VipBalanceTopUp;   // NEW
 use Illuminate\Support\Facades\Notification; // NEW
 use App\Exports\NewCustomersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
 {
@@ -71,7 +72,7 @@ class CustomerController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
-            'vip_card_number' => ['nullable', 'string', 'max:255'], // We'll validate the number part
+            'vip_card_number' => ['nullable', 'string', 'max:255'],
             'gender' => 'nullable|in:Male,Female,Other',
             'age' => 'nullable|integer|min:0',
             'height' => 'nullable|string|max:10',
@@ -80,18 +81,23 @@ class CustomerController extends Controller
             'problem_areas' => 'nullable|array',
         ]);
 
-        $fullVipCardId = null;
+        // --- THIS IS THE CORRECTED LOGIC ---
         if (!empty($validated['vip_package']) && !empty($validated['vip_card_number'])) {
-            $prefix = strtoupper(substr($validated['vip_package'], 0, 1)); // V, S, G, D
+            $prefix = strtoupper(substr($validated['vip_package'], 0, 1));
             $fullVipCardId = $prefix . $validated['vip_card_number'];
 
-            // Now validate the uniqueness of the full ID
-            $request->validate([
-                'vip_card_id_full' => Rule::unique('customers', 'vip_card_id')
-            ], ['vip_card_id_full.unique' => 'This VIP Card ID is already taken.']);
+            // Manually validate the uniqueness of the constructed ID
+            $validator = Validator::make(['vip_card_id' => $fullVipCardId], [
+                'vip_card_id' => Rule::unique('customers', 'vip_card_id')
+            ], ['vip_card_id.unique' => 'This VIP Card ID is already taken.']);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
 
             $validated['vip_card_id'] = $fullVipCardId;
         }
+        // --- END OF CORRECTION ---
 
         do {
             $customerGid = random_int(100000, 999999);
