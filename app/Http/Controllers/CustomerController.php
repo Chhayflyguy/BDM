@@ -67,72 +67,73 @@ class CustomerController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
-            'vip_card_number' => ['nullable', 'string', 'max:255'],
-            'gender' => 'nullable|in:Male,Female,Other',
-            'age' => 'nullable|integer|min:0',
-            'height' => 'nullable|string|max:10',
-            'weight' => 'nullable|string|max:10',
-            'health_conditions' => 'nullable|array',
-            'problem_areas' => 'nullable|array',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'nullable|string|max:20',
+        'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
+        'vip_card_number' => ['nullable', 'string', 'max:255'],
+        'gender' => 'nullable|in:Male,Female,Other',
+        'age' => 'nullable|integer|min:0',
+        'height' => 'nullable|string|max:10',
+        'weight' => 'nullable|string|max:10',
+        'health_conditions' => 'nullable|array',
+        'problem_areas' => 'nullable|array',
+    ]);
 
-        // --- THIS IS THE CORRECTED LOGIC ---
-        if (!empty($validated['vip_package']) && !empty($validated['vip_card_number'])) {
-            $prefix = strtoupper(substr($validated['vip_package'], 0, 1));
-            $fullVipCardId = $prefix . $validated['vip_card_number'];
+    if (!empty($validated['vip_package']) && !empty($validated['vip_card_number'])) {
+        $prefix = strtoupper(substr($validated['vip_package'], 0, 1));
+        $fullVipCardId = $prefix . $validated['vip_card_number'];
 
-            // Manually validate the uniqueness of the constructed ID
-            $validator = Validator::make(['vip_card_id' => $fullVipCardId], [
-                'vip_card_id' => Rule::unique('customers', 'vip_card_id')
-            ], ['vip_card_id.unique' => 'This VIP Card ID is already taken.']);
+        $validator = Validator::make(['vip_card_id' => $fullVipCardId], [
+            'vip_card_id' => Rule::unique('customers', 'vip_card_id')
+        ], ['vip_card_id.unique' => 'This VIP Card ID is already taken.']);
 
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-
-            $validated['vip_card_id'] = $fullVipCardId;
-        }
-        // --- END OF CORRECTION ---
-
-        do {
-            $customerGid = random_int(100000, 999999);
-        } while (Customer::where('customer_gid', $customerGid)->exists());
-
-        $validated['user_id'] = Auth::id();
-        $validated['customer_gid'] = $customerGid;
-
-        if (!empty($validated['vip_package'])) {
-            $package = $this->vipPackages[$validated['vip_package']];
-            $validated['vip_card_type'] = $package['name'];
-            $validated['vip_card_balance'] = $package['price'] + $package['offer'];
-            $validated['vip_card_expires_at'] = isset($package['validity_years'])
-                ? now()->addYears($package['validity_years'])
-                : now()->addMonths($package['validity_months']);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $customer = Customer::create($validated);
-
-        if (!empty($validated['vip_package'])) {
-            $package = $this->vipPackages[$validated['vip_package']];
-            CustomerLog::create([
-                'user_id' => Auth::id(),
-                'customer_id' => $customer->id,
-                'payment_method' => 'VIP Top-Up',
-                'payment_amount' => $package['price'],
-                'status' => 'completed',
-                'is_vip_top_up' => true,
-                'completed_at' => now()
-            ]);
-            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
-        }
-
-        return redirect()->route('customers.index')->with('success', 'New customer created successfully!');
+        $validated['vip_card_id'] = $fullVipCardId;
     }
+
+    do {
+        $customerGid = random_int(100000, 999999);
+    } while (Customer::where('customer_gid', $customerGid)->exists());
+
+    $validated['user_id'] = Auth::id();
+    $validated['customer_gid'] = $customerGid;
+
+    if (!empty($validated['vip_package'])) {
+        $package = $this->vipPackages[$validated['vip_package']];
+        $validated['vip_card_type'] = $package['name'];
+        $validated['vip_card_balance'] = $package['price'] + $package['offer'];
+        $validated['vip_card_expires_at'] = isset($package['validity_years'])
+            ? now()->addYears($package['validity_years'])
+            : now()->addMonths($package['validity_months']);
+    }
+
+    $customer = Customer::create($validated);
+
+    // THIS IS THE FIX:
+    // The notification is now only sent if a package was selected.
+    if (!empty($validated['vip_package'])) {
+        $package = $this->vipPackages[$validated['vip_package']];
+        CustomerLog::create([
+            'user_id' => Auth::id(),
+            'customer_id' => $customer->id,
+            'payment_method' => 'VIP Top-Up',
+            'payment_amount' => $package['price'],
+            'status' => 'completed',
+            'is_vip_top_up' => true,
+            'completed_at' => now()
+        ]);
+        
+        // The notification is now correctly inside this block
+        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
+    }
+
+    return redirect()->route('customers.index')->with('success', 'New customer created successfully!');
+}
 
     /**
      * NEW: Display the specified customer's details and log history.
