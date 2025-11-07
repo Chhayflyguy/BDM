@@ -10,6 +10,10 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PayrollController; // NEW
 use App\Http\Controllers\Auth\SecurityQuestionResetController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 // ...
 Route::get('language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 Route::get('/dashboard', [CustomerLogController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -47,6 +51,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/daily_expenses/export', [DailyExpenseController::class, 'export'])->name('daily_expenses.export');
     Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::post('/accountant/export', [AccountantController::class, 'export'])->name('accountant.export');
+    
+    //admin route 
+    // Change it to this
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('products', AdminProductController::class);
+    Route::get('/products/{product}/stock', [AdminProductController::class, 'showStockForm'])->name('products.stock');
+    Route::post('/products/{product}/stock', [AdminProductController::class, 'addStock'])->name('products.add-stock');
+    Route::resource('services', AdminServiceController::class);
+    Route::resource('bookings', AdminBookingController::class)->only(['index', 'update', 'destroy']);
+});
 });
 
 require __DIR__ . '/auth.php';

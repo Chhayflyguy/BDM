@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('customer_logs', function (Blueprint $table) {
             // Add the new foreign key after the user_id column
-            $table->foreignId('customer_id')->nullable()->after('user_id')->constrained()->onDelete('set null');
+            if (!Schema::hasColumn('customer_logs', 'customer_id')) {
+                $table->foreignId('customer_id')->nullable()->after('user_id')->constrained()->onDelete('set null');
+            }
 
             // Drop old columns that are now stored in the customers table
             if (Schema::hasColumn('customer_logs', 'customer_gid')) {

@@ -19,8 +19,39 @@ class CustomerLogController extends Controller
     use AuthorizesRequests;
     public function index(): View
     {
+        $userId = Auth::id();
+        
+        // Get statistics for dashboard
+        $stats = [
+            'total_customers' => Customer::where('user_id', $userId)->count(),
+            'total_employees' => Employee::where('user_id', $userId)->count(),
+            'active_logs' => CustomerLog::where('user_id', $userId)->where('status', 'active')->count(),
+            'completed_logs' => CustomerLog::where('user_id', $userId)->where('status', 'completed')->count(),
+            'today_income' => CustomerLog::where('user_id', $userId)
+                ->where('status', 'completed')
+                ->whereDate('completed_at', today())
+                ->where(function ($query) {
+                    $query->where('is_vip_top_up', true)
+                          ->orWhere('payment_method', '!=', 'VIP Card');
+                })
+                ->sum('payment_amount'),
+            'this_month_income' => CustomerLog::where('user_id', $userId)
+                ->where('status', 'completed')
+                ->whereYear('completed_at', now()->year)
+                ->whereMonth('completed_at', now()->month)
+                ->where(function ($query) {
+                    $query->where('is_vip_top_up', true)
+                          ->orWhere('payment_method', '!=', 'VIP Card');
+                })
+                ->sum('payment_amount'),
+            'pending_bookings' => Customer::where('user_id', $userId)
+                ->whereNotNull('next_booking_date')
+                ->whereDate('next_booking_date', '>=', today())
+                ->count(),
+        ];
+        
         $groupedLogs = CustomerLog::with('customer') // Eager load customer relationship
-            ->where('user_id', Auth::id())
+            ->where('user_id', $userId)
             ->latest()
             ->get()
             ->groupBy(function ($log) {
@@ -40,7 +71,7 @@ class CustomerLogController extends Controller
         }
         $years = range(date('Y'), date('Y') - 5);
 
-        return view('customer_logs.index', compact('groupedLogs', 'dailyTotals', 'months', 'years'));
+        return view('customer_logs.index', compact('groupedLogs', 'dailyTotals', 'months', 'years', 'stats'));
     }
 
     public function create(): View

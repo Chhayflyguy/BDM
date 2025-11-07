@@ -9,12 +9,11 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        {{-- THIS IS THE NEW STYLE BLOCK TO ADD --}}
         <style>
             @keyframes spin {
                 from {
@@ -27,25 +26,33 @@
             .avatar-spin-on-hover:hover {
                 animation: spin 2s linear infinite;
             }
-            /* This new class ensures a perfect circle */
             .avatar-circle {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                height: 4rem; /* 64px */
-                width: 4rem;  /* 64px */
-                border-radius: 9999px; /* This creates the circle */
+                height: 4rem;
+                width: 4rem;
+                border-radius: 9999px;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
         </style>
-        {{-- END OF NEW STYLE BLOCK --}}
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased bg-gray-50">
+        <div class="min-h-screen bg-gray-50">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white shadow">
+                <header class="bg-white border-b border-gray-200 shadow-sm">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -53,7 +60,7 @@
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="py-8">
                 {{ $slot }}
             </main>
         </div>
