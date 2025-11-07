@@ -31,7 +31,6 @@ class VipPaymentMade extends Notification
         $message = "💳 *VIP Card Payment* 💳\n\n";
         $message .= "*Customer:* {$customer->name}\n";
         $message .= "*Phone:* {$customer->phone}\n";
-        $message .= "*Service Cost:* \${$cost}\n";
         $message .= "*Remaining Balance:* \${$remainingBalance}";
 
         return TelegramMessage::create()->to(env('TELEGRAM_CHAT_ID'))->content($message);
