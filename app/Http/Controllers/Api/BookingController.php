@@ -33,7 +33,7 @@ class BookingController extends Controller
 
         $bookings = Booking::where('customer_id', $customer->id)
             ->with(['service:id,name,price'])
-            ->orderBy('booking_datetime', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($booking) {
                 return [

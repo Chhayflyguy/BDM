@@ -47,7 +47,7 @@ class AdminBookingController extends Controller
 
         // Pagination
         $perPage = $request->get('per_page', 15);
-        $bookings = $query->orderBy('booking_datetime', 'desc')
+        $bookings = $query->orderBy('created_at', 'desc')
             ->paginate($perPage);
 
         // Format bookings for response

@@ -2,8 +2,8 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="font-bold text-2xl text-gray-900 leading-tight">{{ __('Admin Dashboard') }}</h2>
-                <p class="text-sm text-gray-600 mt-1">{{ __('Welcome back') }}! {{ __('Here\'s what\'s happening today') }}.</p>
+                <h2 class="font-bold text-2xl text-gray-900 leading-tight">{{ __('messages.admin_dashboard') }}</h2>
+                <p class="text-sm text-gray-600 mt-1">{{ __('messages.welcome_back') }}! {{ __('messages.heres_whats_happening_today') }}.</p>
             </div>
         </div>
     </x-slot>
@@ -15,10 +15,10 @@
             <div class="bg-white rounded-xl shadow-md p-6 card-hover border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('Total Products') }}</p>
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('messages.total_products') }}</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stats['total_products'] }}</p>
                         <a href="{{ route('admin.products.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 mt-2 inline-flex items-center">
-                            {{ __('View all') }}
+                            {{ __('messages.view_all') }}
                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
@@ -36,10 +36,10 @@
             <div class="bg-white rounded-xl shadow-md p-6 card-hover border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('Total Services') }}</p>
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('messages.total_services') }}</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stats['total_services'] }}</p>
                         <a href="{{ route('admin.services.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 mt-2 inline-flex items-center">
-                            {{ __('View all') }}
+                            {{ __('messages.view_all') }}
                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
@@ -57,10 +57,10 @@
             <div class="bg-white rounded-xl shadow-md p-6 card-hover border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('Total Bookings') }}</p>
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('messages.total_bookings') }}</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stats['total_bookings'] }}</p>
                         <a href="{{ route('admin.bookings.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 mt-2 inline-flex items-center">
-                            {{ __('View all') }}
+                            {{ __('messages.view_all') }}
                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                             </svg>
@@ -78,9 +78,9 @@
             <div class="bg-white rounded-xl shadow-md p-6 card-hover border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('Pending') }}</p>
+                        <p class="text-sm font-medium text-gray-600 uppercase tracking-wide mb-1">{{ __('messages.pending') }}</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $stats['pending_bookings'] }}</p>
-                        <p class="text-xs text-gray-500 mt-1">{{ __('Requires attention') }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ __('messages.requires_attention') }}</p>
                     </div>
                     <div class="p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg">
                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@
             <div class="lg:col-span-2">
                 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                     <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900">{{ __('Quick Actions') }}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.quick_actions') }}</h3>
                     </div>
                     <div class="p-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -108,8 +108,8 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4 flex-1">
-                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-indigo-600">{{ __('Manage Products') }}</h4>
-                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('Add, edit, or remove products') }}</p>
+                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-indigo-600">{{ __('messages.manage_products') }}</h4>
+                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('messages.add_edit_or_remove_products') }}</p>
                                 </div>
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -123,8 +123,8 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4 flex-1">
-                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-purple-600">{{ __('Manage Services') }}</h4>
-                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('Update services, prices & images') }}</p>
+                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-purple-600">{{ __('messages.manage_services') }}</h4>
+                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('messages.update_services_prices_images') }}</p>
                                 </div>
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -138,8 +138,8 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4 flex-1">
-                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-green-600">{{ __('Manage Bookings') }}</h4>
-                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('View & confirm booking requests') }}</p>
+                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-green-600">{{ __('messages.manage_bookings') }}</h4>
+                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('messages.view_confirm_booking_requests') }}</p>
                                 </div>
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -153,8 +153,8 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4 flex-1">
-                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-indigo-600">{{ __('Add New Product') }}</h4>
-                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('Create a new product entry') }}</p>
+                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-indigo-600">{{ __('messages.add_new_product') }}</h4>
+                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('messages.create_new_product_entry') }}</p>
                                 </div>
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -168,7 +168,7 @@
             <!-- Recent Bookings -->
             <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                 <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Recent Bookings') }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ __('messages.recent_bookings') }}</h3>
                 </div>
                 <div class="p-4">
                     @if(isset($stats['recent_bookings']) && $stats['recent_bookings']->count() > 0)
@@ -184,20 +184,26 @@
                                         @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
                                         @else bg-red-100 text-red-800
                                         @endif">
-                                        {{ ucfirst($booking->status) }}
+                                        @if($booking->status === 'confirmed')
+                                            {{ __('messages.confirmed') }}
+                                        @elseif($booking->status === 'pending')
+                                            {{ __('messages.pending') }}
+                                        @else
+                                            {{ __('messages.cancelled') }}
+                                        @endif
                                     </span>
                                 </div>
                             @endforeach
                         </div>
                         <a href="{{ route('admin.bookings.index') }}" class="block mt-4 text-center text-sm font-medium text-indigo-600 hover:text-indigo-800">
-                            {{ __('View all bookings') }} →
+                            {{ __('messages.view_all_bookings') }} →
                         </a>
                     @else
                         <div class="text-center py-8">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('No recent bookings') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('messages.no_recent_bookings') }}</p>
                         </div>
                     @endif
                 </div>
@@ -209,9 +215,9 @@
             <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                 <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 border-b border-gray-200">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-white">{{ __('Admin Users') }}</h3>
+                        <h3 class="text-lg font-semibold text-white">{{ __('messages.admin_users') }}</h3>
                         <span class="px-3 py-1 text-sm font-medium bg-white/20 text-white rounded-full">
-                            {{ $stats['admin_users']->count() }} {{ __('Admin(s)') }}
+                            {{ $stats['admin_users']->count() }} {{ __('messages.admins') }}
                         </span>
                     </div>
                 </div>
@@ -221,10 +227,10 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Name') }}</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Created At') }}</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.name') }}</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.email') }}</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.created_at') }}</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('messages.status') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -249,7 +255,7 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                    {{ __('Admin') }}
+                                                    {{ __('messages.admin') }}
                                                 </span>
                                             </td>
                                         </tr>
@@ -262,8 +268,8 @@
                             <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            <p class="mt-4 text-sm font-medium text-gray-900">{{ __('No admin users found') }}</p>
-                            <p class="mt-2 text-sm text-gray-500">{{ __('Create an admin user using the command: php artisan user:make-admin') }}</p>
+                            <p class="mt-4 text-sm font-medium text-gray-900">{{ __('messages.no_admin_users_found') }}</p>
+                            <p class="mt-2 text-sm text-gray-500">{{ __('messages.create_admin_user_command') }}</p>
                         </div>
                     @endif
                 </div>

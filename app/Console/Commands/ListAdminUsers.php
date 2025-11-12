@@ -18,7 +18,7 @@ class ListAdminUsers extends Command
             ->get();
 
         if ($admins->isEmpty()) {
-            $this->info('No admin users found.');
+            $this->info('No admin users found.'); 
             return 0;
         }
 

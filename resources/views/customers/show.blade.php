@@ -12,6 +12,14 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            <div>
+                <a href="{{ route('customers.index') }}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    {{ __('messages.back_to_customers') }}
+                </a>
+            </div>
             @if (session('success'))
             <div class="mb-4 p-4 bg-green-100 text-green-700 border border-green-200 rounded-md shadow-sm">
                 {{ session('success') }}

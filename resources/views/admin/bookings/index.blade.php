@@ -2,13 +2,21 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-gray-900 leading-tight">{{ __('Manage Online Bookings') }}</h2>
-                <p class="text-sm text-gray-600 mt-1">{{ __('Review and manage customer booking requests') }}</p>
+                <h2 class="font-bold text-2xl text-gray-900 leading-tight">{{ __('messages.manage_online_bookings') }}</h2>
+                <p class="text-sm text-gray-600 mt-1">{{ __('messages.review_manage_booking_requests') }}</p>
             </div>
         </div>
     </x-slot>
 
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="mb-4">
+            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                {{ __('messages.back_to_admin_dashboard') }}
+            </a>
+        </div>
         @if (session('success'))
             <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-400 rounded-lg shadow-sm">
                 <div class="flex items-center">
@@ -22,17 +30,17 @@
 
         <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
             <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-green-700">
-                <h3 class="text-lg font-semibold text-white">{{ __('Bookings Overview') }}</h3>
+                <h3 class="text-lg font-semibold text-white">{{ __('messages.bookings_overview') }}</h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gradient-to-r from-green-50 to-green-100">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Customer') }}</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Service') }}</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Booking Time') }}</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Status') }}</th>
-                            <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Actions') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.customer') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.service') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.booking_time') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.status') }}</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -78,21 +86,21 @@
                                         @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800 focus:ring-yellow-500
                                         @else bg-red-100 text-red-800 focus:ring-red-500
                                         @endif">
-                                        <option value="pending" @selected($booking->status == 'pending')>{{ __('Pending') }}</option>
-                                        <option value="confirmed" @selected($booking->status == 'confirmed')>{{ __('Confirmed') }}</option>
-                                        <option value="cancelled" @selected($booking->status == 'cancelled')>{{ __('Cancelled') }}</option>
+                                        <option value="pending" @selected($booking->status == 'pending')>{{ __('messages.pending') }}</option>
+                                        <option value="confirmed" @selected($booking->status == 'confirmed')>{{ __('messages.confirmed') }}</option>
+                                        <option value="cancelled" @selected($booking->status == 'cancelled')>{{ __('messages.cancelled') }}</option>
                                     </select>
                                 </form>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <form action="{{ route('admin.bookings.destroy', $booking) }}" method="POST" class="inline-block" onsubmit="return confirm('{{ __('Are you sure you want to delete this booking?') }}');">
+                                <form action="{{ route('admin.bookings.destroy', $booking) }}" method="POST" class="inline-block" onsubmit="return confirm({{ json_encode(__('messages.are_you_sure_delete_booking')) }});">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200">
                                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
-                                        {{ __('Delete') }}
+                                        {{ __('messages.delete') }}
                                     </button>
                                 </form>
                             </td>
@@ -104,8 +112,8 @@
                                     <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <p class="text-gray-500 text-lg font-medium mb-2">{{ __('No bookings found') }}</p>
-                                    <p class="text-gray-400 text-sm">{{ __('All bookings have been processed or no bookings have been made yet') }}</p>
+                                    <p class="text-gray-500 text-lg font-medium mb-2">{{ __('messages.no_bookings_found') }}</p>
+                                    <p class="text-gray-400 text-sm">{{ __('messages.all_bookings_processed_or_none') }}</p>
                                 </div>
                             </td>
                         </tr>
