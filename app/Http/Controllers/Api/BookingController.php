@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Booking;
 use App\Models\Service;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\DB;
 use App\Notifications\NewBookingCreated;
 
 class BookingController extends Controller
@@ -32,7 +34,7 @@ class BookingController extends Controller
         }
 
         $bookings = Booking::where('customer_id', $customer->id)
-            ->with(['service:id,name,price'])
+            ->with(['service:id,name,price', 'products:id,name,price'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($booking) {
@@ -43,6 +45,14 @@ class BookingController extends Controller
                     'booking_datetime' => $booking->booking_datetime,
                     'status' => $booking->status,
                     'notes' => $booking->notes,
+                    'products' => $booking->products->map(function ($product) {
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name,
+                            'quantity' => $product->pivot->quantity,
+                            'price_at_time' => $product->pivot->price_at_time,
+                        ];
+                    }),
                     'created_at' => $booking->created_at,
                 ];
             });
@@ -63,7 +73,7 @@ class BookingController extends Controller
         ]);
 
         // Load relationships
-        $booking->load(['customer:id,name,phone', 'service:id,name,price']);
+        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
 
         // Verify that the booking belongs to the customer with this phone number
         if ($booking->customer->phone !== $validated['phone']) {
@@ -83,6 +93,14 @@ class BookingController extends Controller
                     'name' => $booking->service->name,
                     'price' => $booking->service->price,
                 ],
+                'products' => $booking->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'quantity' => $product->pivot->quantity,
+                        'price_at_time' => $product->pivot->price_at_time,
+                    ];
+                }),
                 'booking_datetime' => $booking->booking_datetime,
                 'status' => $booking->status,
                 'notes' => $booking->notes,
@@ -103,6 +121,9 @@ class BookingController extends Controller
             'service_id' => 'required|exists:services,id',
             'booking_datetime' => 'required|date|after:now',
             'notes' => 'nullable|string',
+            'products' => 'nullable|array',
+            'products.*.product_id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
         ]);
 
         // Find existing customer by phone or create a new one
@@ -121,33 +142,78 @@ class BookingController extends Controller
             $customer->save();
         }
 
-        $booking = Booking::create([
-            'customer_id' => $customer->id,
-            'service_id' => $validated['service_id'],
-            'booking_datetime' => $validated['booking_datetime'],
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        // Load relationships for response
-        $booking->load(['service:id,name,price']);
-
-        // Push Telegram notification
+        // Use database transaction to ensure data consistency
+        DB::beginTransaction();
         try {
-            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
-                ->notify(new NewBookingCreated($booking));
-        } catch (\Throwable $e) {
-            // Silently ignore notification failures to not block booking creation
-        }
+            $booking = Booking::create([
+                'customer_id' => $customer->id,
+                'service_id' => $validated['service_id'],
+                'booking_datetime' => $validated['booking_datetime'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
 
-        return response()->json([
-            'message' => 'Booking created successfully.',
-            'booking' => [
-                'id' => $booking->id,
-                'status' => $booking->status,
-                'booking_datetime' => $booking->booking_datetime,
-                'service_name' => $booking->service->name,
-            ]
-        ], 201);
+            // Handle products if provided
+            if (!empty($validated['products'])) {
+                foreach ($validated['products'] as $productData) {
+                    $product = Product::findOrFail($productData['product_id']);
+                    $quantity = $productData['quantity'];
+
+                    // Check if enough stock is available
+                    if ($product->quantity < $quantity) {
+                        DB::rollBack();
+                        return response()->json([
+                            'message' => "Insufficient stock for product: {$product->name}. Available: {$product->quantity}, Requested: {$quantity}",
+                        ], 400);
+                    }
+
+                    // Attach product to booking with quantity and price
+                    $booking->products()->attach($product->id, [
+                        'quantity' => $quantity,
+                        'price_at_time' => $product->price,
+                    ]);
+
+                    // Decrease stock
+                    $product->quantity -= $quantity;
+                    $product->save();
+                }
+            }
+
+            DB::commit();
+
+            // Load relationships for response
+            $booking->load(['service:id,name,price', 'products:id,name,price']);
+
+            // Push Telegram notification
+            try {
+                Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
+                    ->notify(new NewBookingCreated($booking));
+            } catch (\Throwable $e) {
+                // Silently ignore notification failures to not block booking creation
+            }
+
+            return response()->json([
+                'message' => 'Booking created successfully.',
+                'booking' => [
+                    'id' => $booking->id,
+                    'status' => $booking->status,
+                    'booking_datetime' => $booking->booking_datetime,
+                    'service_name' => $booking->service->name,
+                    'products' => $booking->products->map(function ($product) {
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name,
+                            'quantity' => $product->pivot->quantity,
+                            'price_at_time' => $product->pivot->price_at_time,
+                        ];
+                    }),
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to create booking: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -220,17 +286,38 @@ class BookingController extends Controller
             ], 400);
         }
 
-        // Instead of deleting, we change the status. This is better for record-keeping.
-        $booking->status = 'cancelled';
-        $booking->save();
+        // Use database transaction to ensure data consistency
+        DB::beginTransaction();
+        try {
+            // Load products before cancelling
+            $booking->load('products');
 
-        return response()->json([
-            'message' => 'Booking cancelled successfully.',
-            'booking' => [
-                'id' => $booking->id,
-                'status' => $booking->status,
-            ]
-        ]);
+            // Restore stock for all products in this booking
+            foreach ($booking->products as $product) {
+                $quantity = $product->pivot->quantity;
+                $product->quantity += $quantity;
+                $product->save();
+            }
+
+            // Instead of deleting, we change the status. This is better for record-keeping.
+            $booking->status = 'cancelled';
+            $booking->save();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Booking cancelled successfully.',
+                'booking' => [
+                    'id' => $booking->id,
+                    'status' => $booking->status,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to cancel booking: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

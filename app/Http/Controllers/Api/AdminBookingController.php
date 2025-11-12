@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminBookingController extends Controller
 {
@@ -20,7 +22,7 @@ class AdminBookingController extends Controller
             ], 403);
         }
 
-        $query = Booking::with(['customer:id,name,phone', 'service:id,name,price']);
+        $query = Booking::with(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -64,6 +66,14 @@ class AdminBookingController extends Controller
                     'name' => $booking->service->name,
                     'price' => $booking->service->price,
                 ],
+                'products' => $booking->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'quantity' => $product->pivot->quantity,
+                        'price_at_time' => $product->pivot->price_at_time,
+                    ];
+                }),
                 'booking_datetime' => $booking->booking_datetime,
                 'status' => $booking->status,
                 'notes' => $booking->notes,
@@ -96,7 +106,7 @@ class AdminBookingController extends Controller
             ], 403);
         }
 
-        $booking->load(['customer:id,name,phone', 'service:id,name,price']);
+        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
 
         return response()->json([
             'message' => 'Booking retrieved successfully.',
@@ -112,6 +122,14 @@ class AdminBookingController extends Controller
                     'name' => $booking->service->name,
                     'price' => $booking->service->price,
                 ],
+                'products' => $booking->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'quantity' => $product->pivot->quantity,
+                        'price_at_time' => $product->pivot->price_at_time,
+                    ];
+                }),
                 'booking_datetime' => $booking->booking_datetime,
                 'status' => $booking->status,
                 'notes' => $booking->notes,
@@ -137,20 +155,74 @@ class AdminBookingController extends Controller
             'status' => 'required|in:pending,confirmed,cancelled',
         ]);
 
-        $booking->update($validated);
+        $oldStatus = $booking->status;
+        $newStatus = $validated['status'];
 
-        $booking->load(['customer:id,name,phone', 'service:id,name,price']);
+        // Use database transaction to ensure data consistency
+        DB::beginTransaction();
+        try {
+            // Load products before status change
+            $booking->load('products');
 
-        return response()->json([
-            'message' => 'Booking status updated successfully.',
-            'booking' => [
-                'id' => $booking->id,
-                'status' => $booking->status,
-                'customer_name' => $booking->customer->name,
-                'service_name' => $booking->service->name,
-                'booking_datetime' => $booking->booking_datetime,
-            ]
-        ], 200);
+            // Handle stock changes based on status transitions
+            if ($oldStatus !== $newStatus) {
+                // If changing to cancelled, restore stock
+                if ($newStatus === 'cancelled' && $oldStatus !== 'cancelled') {
+                    foreach ($booking->products as $product) {
+                        $quantity = $product->pivot->quantity;
+                        $product->quantity += $quantity;
+                        $product->save();
+                    }
+                }
+                // If changing from cancelled to confirmed/pending, decrease stock
+                elseif ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                    foreach ($booking->products as $product) {
+                        $quantity = $product->pivot->quantity;
+                        
+                        // Check if enough stock is available
+                        if ($product->quantity < $quantity) {
+                            DB::rollBack();
+                            return response()->json([
+                                'message' => "Insufficient stock for product: {$product->name}. Available: {$product->quantity}, Required: {$quantity}",
+                            ], 400);
+                        }
+                        
+                        $product->quantity -= $quantity;
+                        $product->save();
+                    }
+                }
+            }
+
+            $booking->update($validated);
+
+            DB::commit();
+
+            $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
+
+            return response()->json([
+                'message' => 'Booking status updated successfully.',
+                'booking' => [
+                    'id' => $booking->id,
+                    'status' => $booking->status,
+                    'customer_name' => $booking->customer->name,
+                    'service_name' => $booking->service->name,
+                    'booking_datetime' => $booking->booking_datetime,
+                    'products' => $booking->products->map(function ($product) {
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name,
+                            'quantity' => $product->pivot->quantity,
+                            'price_at_time' => $product->pivot->price_at_time,
+                        ];
+                    }),
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to update booking status: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
 
