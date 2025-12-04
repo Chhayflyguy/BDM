@@ -14,7 +14,7 @@
             </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('employees.store') }}">
+                    <form method="POST" action="{{ route('employees.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -38,6 +38,13 @@
                                     <option value="Other" @selected(old('gender') == 'Other')>Other</option>
                                 </select>
                             </div>
+                            <div>
+                                <x-input-label for="working_status" :value="__('messages.working_status')" />
+                                <select name="working_status" id="working_status" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                                    <option value="Active" @selected(old('working_status') == 'Active')>{{ __('messages.active') }}</option>
+                                    <option value="Inactive" @selected(old('working_status') == 'Inactive')>{{ __('messages.inactive') }}</option>
+                                </select>
+                            </div>
                             <div class="md:col-span-2">
                                 <x-input-label for="address" :value="__('messages.address_optional')" />
                                 <x-text-input id="address" class="block mt-1 w-full" type="text" name="address" :value="old('address')" />
@@ -45,6 +52,11 @@
                             <div class="md:col-span-2">
                                 <x-input-label for="experience" :value="__('messages.experience_optional')" />
                                 <textarea id="experience" name="experience" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ old('experience') }}</textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <x-input-label for="profile_image" value="Profile Image (Optional)" />
+                                <input id="profile_image" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" type="file" name="profile_image" accept="image/*" />
+                                <p class="mt-1 text-sm text-gray-500">Max size: 2MB. Accepted formats: JPG, PNG, GIF</p>
                             </div>
                         </div>
                         <div class="flex items-center justify-end mt-6">

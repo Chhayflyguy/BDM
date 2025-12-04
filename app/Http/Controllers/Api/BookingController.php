@@ -34,7 +34,7 @@ class BookingController extends Controller
         }
 
         $bookings = Booking::where('customer_id', $customer->id)
-            ->with(['service:id,name,price', 'products:id,name,price'])
+            ->with(['service:id,name,price', 'products:id,name,price', 'employee'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($booking) {
@@ -42,6 +42,12 @@ class BookingController extends Controller
                     'id' => $booking->id,
                     'service_name' => $booking->service->name,
                     'service_price' => $booking->service->price,
+                    'employee' => $booking->employee ? [
+                        'id' => $booking->employee->id,
+                        'name' => $booking->employee->name,
+                        'phone' => $booking->employee->phone,
+                        'profile_image_url' => $booking->employee->profile_image_url,
+                    ] : null,
                     'booking_datetime' => $booking->booking_datetime,
                     'status' => $booking->status,
                     'notes' => $booking->notes,
@@ -73,7 +79,7 @@ class BookingController extends Controller
         ]);
 
         // Load relationships
-        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
+        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price', 'employee']);
 
         // Verify that the booking belongs to the customer with this phone number
         if ($booking->customer->phone !== $validated['phone']) {
@@ -93,6 +99,12 @@ class BookingController extends Controller
                     'name' => $booking->service->name,
                     'price' => $booking->service->price,
                 ],
+                'employee' => $booking->employee ? [
+                    'id' => $booking->employee->id,
+                    'name' => $booking->employee->name,
+                    'phone' => $booking->employee->phone,
+                    'profile_image_url' => $booking->employee->profile_image_url,
+                ] : null,
                 'products' => $booking->products->map(function ($product) {
                     return [
                         'id' => $product->id,
@@ -119,6 +131,7 @@ class BookingController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:50',
             'service_id' => 'required|exists:services,id',
+            'employee_id' => 'nullable|exists:employees,id',
             'booking_datetime' => 'required|date|after:now',
             'notes' => 'nullable|string',
             'products' => 'nullable|array',
@@ -148,6 +161,7 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'customer_id' => $customer->id,
                 'service_id' => $validated['service_id'],
+                'employee_id' => $validated['employee_id'] ?? null,
                 'booking_datetime' => $validated['booking_datetime'],
                 'notes' => $validated['notes'] ?? null,
             ]);
@@ -224,6 +238,7 @@ class BookingController extends Controller
         $validated = $request->validate([
             'phone' => 'required|string|max:50',
             'booking_datetime' => 'required|date|after:now',
+            'employee_id' => 'nullable|exists:employees,id',
             'notes' => 'nullable|string',
         ]);
 
@@ -246,8 +261,12 @@ class BookingController extends Controller
 
         $booking->update([
             'booking_datetime' => $validated['booking_datetime'],
+            'employee_id' => $validated['employee_id'] ?? $booking->employee_id,
             'notes' => $validated['notes'] ?? $booking->notes,
         ]);
+
+        // Reload with employee relationship
+        $booking->load('employee');
 
         return response()->json([
             'message' => 'Booking updated successfully.',
@@ -256,6 +275,12 @@ class BookingController extends Controller
                 'status' => $booking->status,
                 'booking_datetime' => $booking->booking_datetime,
                 'notes' => $booking->notes,
+                'employee' => $booking->employee ? [
+                    'id' => $booking->employee->id,
+                    'name' => $booking->employee->name,
+                    'phone' => $booking->employee->phone,
+                    'profile_image_url' => $booking->employee->profile_image_url,
+                ] : null,
             ]
         ]);
     }

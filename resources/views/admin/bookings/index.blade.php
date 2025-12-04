@@ -38,6 +38,7 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.customer') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.service') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.therapist') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.products') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.booking_time') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">{{ __('messages.status') }}</th>
@@ -66,6 +67,22 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $booking->service->name }}</div>
                                 <div class="text-xs text-gray-500">${{ number_format($booking->service->price, 2) }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                @if($booking->employee)
+                                    <div class="flex items-center">
+                                        @if($booking->employee->profile_image)
+                                            <img src="{{ asset('storage/' . $booking->employee->profile_image) }}" alt="{{ $booking->employee->name }}" class="h-6 w-6 rounded-full object-cover mr-2">
+                                        @else
+                                            <div class="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 mr-2">
+                                                {{ substr($booking->employee->name, 0, 1) }}
+                                            </div>
+                                        @endif
+                                        {{ $booking->employee->name }}
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 italic">{{ __('messages.any_therapist') }}</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 @if($booking->products->count() > 0)

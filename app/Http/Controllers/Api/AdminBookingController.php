@@ -22,7 +22,7 @@ class AdminBookingController extends Controller
             ], 403);
         }
 
-        $query = Booking::with(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
+        $query = Booking::with(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price', 'employee']);
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -74,6 +74,12 @@ class AdminBookingController extends Controller
                         'price_at_time' => $product->pivot->price_at_time,
                     ];
                 }),
+                'employee' => $booking->employee ? [
+                    'id' => $booking->employee->id,
+                    'name' => $booking->employee->name,
+                    'phone' => $booking->employee->phone,
+                    'profile_image_url' => $booking->employee->profile_image_url,
+                ] : null,
                 'booking_datetime' => $booking->booking_datetime,
                 'status' => $booking->status,
                 'notes' => $booking->notes,
@@ -106,7 +112,7 @@ class AdminBookingController extends Controller
             ], 403);
         }
 
-        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
+        $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price', 'employee']);
 
         return response()->json([
             'message' => 'Booking retrieved successfully.',
@@ -130,6 +136,12 @@ class AdminBookingController extends Controller
                         'price_at_time' => $product->pivot->price_at_time,
                     ];
                 }),
+                'employee' => $booking->employee ? [
+                    'id' => $booking->employee->id,
+                    'name' => $booking->employee->name,
+                    'phone' => $booking->employee->phone,
+                    'profile_image_url' => $booking->employee->profile_image_url,
+                ] : null,
                 'booking_datetime' => $booking->booking_datetime,
                 'status' => $booking->status,
                 'notes' => $booking->notes,
@@ -197,7 +209,7 @@ class AdminBookingController extends Controller
 
             DB::commit();
 
-            $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price']);
+            $booking->load(['customer:id,name,phone', 'service:id,name,price', 'products:id,name,price', 'employee']);
 
             return response()->json([
                 'message' => 'Booking status updated successfully.',
@@ -215,6 +227,12 @@ class AdminBookingController extends Controller
                             'price_at_time' => $product->pivot->price_at_time,
                         ];
                     }),
+                    'employee' => $booking->employee ? [
+                        'id' => $booking->employee->id,
+                        'name' => $booking->employee->name,
+                        'phone' => $booking->employee->phone,
+                        'profile_image_url' => $booking->employee->profile_image_url,
+                    ] : null,
                 ]
             ], 200);
         } catch (\Exception $e) {

@@ -20,7 +20,20 @@ class Employee extends Model
         'email',
         'address', // NEW
         'experience',
+        'working_status',
+        'profile_image',
     ];
+
+    /**
+     * Get the full URL for the profile image
+     */
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        if ($this->profile_image) {
+            return asset('storage/' . $this->profile_image);
+        }
+        return null;
+    }
 
     public function user(): BelongsTo
     {

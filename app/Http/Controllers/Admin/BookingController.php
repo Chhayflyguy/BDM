@@ -12,7 +12,7 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['customer', 'service', 'products'])->latest()->paginate(15);
+        $bookings = Booking::with(['customer', 'service', 'products', 'employee'])->latest()->paginate(15);
         return view('admin.bookings.index', compact('bookings'));
     }
 

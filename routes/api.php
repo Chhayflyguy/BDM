@@ -36,6 +36,7 @@ Route::apiResource('v1/customer-logs', CustomerLogController::class)->only(['ind
 
 // --- NEW PUBLIC API ROUTES ---
 Route::get('/services', [ApiServiceController::class, 'index']);
+Route::apiResource('employees', \App\Http\Controllers\Api\EmployeeController::class)->only(['index', 'show']);
 
 // Get a list of all available products
 Route::get('/products', [ApiProductController::class, 'index']);

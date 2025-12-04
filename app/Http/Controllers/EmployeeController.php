@@ -28,6 +28,8 @@ class EmployeeController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'experience' => 'nullable|string',
+            'working_status' => 'nullable|in:Active,Inactive',
+            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
 
         do {
@@ -36,6 +38,14 @@ class EmployeeController extends Controller
 
         $validated['user_id'] = Auth::id();
         $validated['employee_gid'] = $employeeGid;
+        
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            $filename = time() . '_' . $employeeGid . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('employees', $filename, 'public');
+            $validated['profile_image'] = $path;
+        }
         
         Employee::create($validated);
 
@@ -57,7 +67,22 @@ class EmployeeController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
             'experience' => 'nullable|string',
+            'working_status' => 'nullable|in:Active,Inactive',
+            'profile_image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:2048',
         ]);
+        
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old image if exists
+            if ($employee->profile_image && \Storage::disk('public')->exists($employee->profile_image)) {
+                \Storage::disk('public')->delete($employee->profile_image);
+            }
+            
+            $file = $request->file('profile_image');
+            $filename = time() . '_' . $employee->employee_gid . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('employees', $filename, 'public');
+            $validated['profile_image'] = $path;
+        }
         
         $employee->update($validated);
 

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Booking extends Model
 {
     use HasFactory;
-    protected $fillable = ['customer_id', 'service_id', 'booking_datetime', 'status', 'notes'];
+    protected $fillable = ['customer_id', 'service_id', 'employee_id', 'booking_datetime', 'status', 'notes'];
 
     public function customer(): BelongsTo
     {
@@ -20,6 +20,11 @@ class Booking extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
     }
 
     public function products(): BelongsToMany

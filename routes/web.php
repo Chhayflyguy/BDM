@@ -32,9 +32,14 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('daily_expenses', DailyExpenseController::class)->except(['show']);
     Route::get('/accountant', [AccountantController::class, 'index'])->name('accountant.index');
-    Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index'); // NEW
-    Route::resource('employees', EmployeeController::class)->except(['show']); // MODIFIED
+    
+    // Payroll Routes
+Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
+Route::get('/payroll/employee/{employee}', [PayrollController::class, 'show'])->name('payroll.show');
+Route::patch('/payroll/customer-log/{customerLog}/commission', [PayrollController::class, 'updateCommission'])->name('payroll.update-commission');
+Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export'); // MODIFIED
     // Resource routes
+    Route::resource('employees', EmployeeController::class)->except(['show']); // MODIFIED
     Route::resource('customer_logs', CustomerLogController::class); // MODIFIED: Enable all log routes
     Route::resource('customers', CustomerController::class)->except(['destroy']);
 

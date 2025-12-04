@@ -34,6 +34,7 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.id') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.name') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.phone_number') }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.working_status') }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.address_optional') }}</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.actions') }}</th>
                         </tr>
@@ -45,9 +46,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
-                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white font-semibold">
-                                                {{ strtoupper(substr($employee->name, 0, 1)) }}
-                                            </div>
+                                            @if($employee->profile_image)
+                                                <img src="{{ asset('storage/' . $employee->profile_image) }}" alt="{{ $employee->name }}" class="h-10 w-10 rounded-full object-cover">
+                                            @else
+                                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center text-white font-semibold">
+                                                    {{ strtoupper(substr($employee->name, 0, 1)) }}
+                                                </div>
+                                            @endif
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $employee->name }}</div>
@@ -62,9 +67,12 @@
                                             </svg>
                                             {{ $employee->phone }}
                                         </div>
-                                    @else
-                                        <span class="text-gray-400">N/A</span>
                                     @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $employee->working_status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $employee->working_status === 'Active' ? __('messages.active') : __('messages.inactive') }}
+                                    </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                     {{ $employee->address ?? 'N/A' }}
