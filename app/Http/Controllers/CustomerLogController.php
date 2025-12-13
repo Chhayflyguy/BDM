@@ -76,8 +76,32 @@ class CustomerLogController extends Controller
 
     public function create(): View
     {
-        $customers = Customer::where('user_id', Auth::id())->orderBy('name')->get();
-        return view('customer_logs.create', compact('customers'));
+        // Only get customers created today by default
+        $todayCustomers = Customer::where('user_id', Auth::id())
+            ->whereDate('created_at', today())
+            ->orderBy('name')
+            ->get();
+        return view('customer_logs.create', compact('todayCustomers'));
+    }
+
+    /**
+     * Search customers for AJAX requests
+     */
+    public function searchCustomers(Request $request)
+    {
+        $query = $request->get('query', '');
+        
+        $customers = Customer::where('user_id', Auth::id())
+            ->where(function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('customer_gid', 'LIKE', "%{$query}%")
+                  ->orWhere('phone', 'LIKE', "%{$query}%");
+            })
+            ->orderBy('name')
+            ->limit(50)
+            ->get(['id', 'name', 'customer_gid', 'phone', 'created_at']);
+        
+        return response()->json($customers);
     }
 
     public function store(Request $request): RedirectResponse

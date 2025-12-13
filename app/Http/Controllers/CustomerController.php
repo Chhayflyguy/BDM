@@ -221,4 +221,24 @@ class CustomerController extends Controller
         $fileName = 'New-Customers-' . $request->year . '-' . $request->month . '.xlsx';
         return Excel::download(new NewCustomersExport($request->year, $request->month), $fileName);
     }
+
+    /**
+     * Search customers for AJAX requests (used in add new log dropdown)
+     */
+    public function searchCustomers(Request $request)
+    {
+        $query = $request->get('query', '');
+        
+        $customers = Customer::where('user_id', Auth::id())
+            ->where(function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('customer_gid', 'LIKE', "%{$query}%")
+                  ->orWhere('phone', 'LIKE', "%{$query}%");
+            })
+            ->orderBy('name')
+            ->limit(50)
+            ->get(['id', 'name', 'customer_gid', 'phone', 'created_at']);
+        
+        return response()->json($customers);
+    }
 }
