@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/customers/{customer}/top-up', [CustomerController::class, 'topUpVipBalance'])->name('customers.top-up'); // NEW
     Route::get('/customer_logs/{customerLog}/complete', [CustomerLogController::class, 'showCompletionForm'])->name('customer_logs.complete.form');
     Route::post('/customer_logs/{customerLog}/complete', [CustomerLogController::class, 'markAsComplete'])->name('customer_logs.complete.submit');
+    Route::patch('/customer_logs/{customerLog}/update-completed', [CustomerLogController::class, 'updateCompleted'])->name('customer_logs.update_completed');
     Route::post('/customer_logs/export', [CustomerLogController::class, 'export'])->name('customer_logs.export');
     Route::get('/customers/search', [CustomerController::class, 'searchCustomers'])->name('customers.search');
 

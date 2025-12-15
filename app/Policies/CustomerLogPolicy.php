@@ -9,12 +9,12 @@ use Illuminate\Auth\Access\Response;
 class CustomerLogPolicy
 {
     /**
-     * MODIFIED: Determine whether the user can update the model.
-     * Only allow if the user is the owner AND the log is still 'active'.
+     * Determine whether the user can update the model.
+     * Allow if the user is the owner (allows editing both active and completed logs).
      */
     public function update(User $user, CustomerLog $customerLog): bool
     {
-        return $user->id === $customerLog->user_id && $customerLog->status === 'active';
+        return $user->id === $customerLog->user_id;
     }
 
     /**

@@ -16,6 +16,8 @@ class CustomerLog extends Model
     protected $fillable = [
         'user_id',
         'customer_id',
+        'product_id', // NEW: For tracking product purchases
+        'product_quantity', // NEW: Track quantity purchased
         'employee_id', 
         'payment_method', 
         'employee_commission', 
@@ -60,5 +62,13 @@ class CustomerLog extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    /**
+     * NEW: Define the relationship to the Product model.
+     */
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 }
