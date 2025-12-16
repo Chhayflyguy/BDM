@@ -94,6 +94,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.customer') }}</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.product') }}</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.masseuse') }}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('Created By') }}</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.payment') }}</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.method') }}</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">{{ __('messages.status') }}</th>
@@ -129,6 +130,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                         {{ $log->masseuse_name ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if($log->user)
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">{{ $log->user->name }}</span>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -191,12 +199,16 @@
                                         </div>
                                         @else
                                         <div class="flex items-center justify-end">
-                                            <a href="{{ route('customer_logs.edit', $log) }}" class="inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                                {{ __('messages.edit') }}
-                                            </a>
+                                            @can('update', $log)
+                                                <a href="{{ route('customer_logs.edit', $log) }}" class="inline-flex items-center px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                    {{ __('messages.edit') }}
+                                                </a>
+                                            @else
+                                                <span class="text-sm text-gray-500 italic">{{ __('Admin only') }}</span>
+                                            @endcan
                                         </div>
                                         @endif
                                     </td>
@@ -205,7 +217,7 @@
                             </tbody>
                             <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100">
                                 <tr>
-                                    <td colspan="3" class="px-6 py-3 text-right text-sm font-bold text-gray-700">{{ __('Daily Total') }}:</td>
+                                    <td colspan="4" class="px-6 py-3 text-right text-sm font-bold text-gray-700">{{ __('Daily Total') }}:</td>
                                     <td class="px-6 py-3 text-left">
                                         <span class="text-lg font-bold text-green-600">${{ number_format($dailyTotals[$date]['total_payment'] ?? 0, 2) }}</span>
                                     </td>

@@ -10,7 +10,7 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::where('user_id', Auth::id())->latest()->get();
+        $employees = Employee::latest()->get();
         return view('employees.index', compact('employees'));
     }
 

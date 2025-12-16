@@ -10,19 +10,27 @@ class CustomerLogPolicy
 {
     /**
      * Determine whether the user can update the model.
-     * Allow if the user is the owner (allows editing both active and completed logs).
+     * Only admins can edit completed logs.
+     * All users can edit active logs.
      */
     public function update(User $user, CustomerLog $customerLog): bool
     {
-        return $user->id === $customerLog->user_id;
+        // If the log is completed, only admin can edit
+        if ($customerLog->status === 'completed') {
+            return $user->isAdmin();
+        }
+        
+        // Active logs can be edited by all users
+        return true;
     }
 
     /**
-     * MODIFIED: Determine whether the user can delete the model.
-     * Only allow if the user is the owner AND the log is still 'active'.
+     * Determine whether the user can delete the model.
+     * All users can delete active logs only.
      */
     public function delete(User $user, CustomerLog $customerLog): bool
     {
-        return $user->id === $customerLog->user_id && $customerLog->status === 'active';
+        // Only allow deletion of active logs
+        return $customerLog->status === 'active';
     }
 }

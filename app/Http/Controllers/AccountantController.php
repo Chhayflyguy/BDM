@@ -19,8 +19,7 @@ class AccountantController extends Controller
         $currentYear = $request->input('year', now()->year);
 
         
-        $totalIncome = CustomerLog::where('user_id', Auth::id())
-            ->where('status', 'completed')
+        $totalIncome = CustomerLog::where('status', 'completed')
             ->whereYear('completed_at', $currentYear)
             ->whereMonth('completed_at', $currentMonth)
             ->where(function ($query) {
@@ -29,8 +28,7 @@ class AccountantController extends Controller
             })
             ->sum('payment_amount');
 
-        $incomeByPaymentMethod = CustomerLog::where('user_id', Auth::id())
-            ->where('status', 'completed')
+        $incomeByPaymentMethod = CustomerLog::where('status', 'completed')
             ->whereYear('completed_at', $currentYear)
             ->whereMonth('completed_at', $currentMonth)
             ->where('payment_method', '!=', 'VIP Card') // Exclude VIP Card payments
@@ -38,13 +36,11 @@ class AccountantController extends Controller
             ->select('payment_method', DB::raw('SUM(payment_amount) as total'))
             ->pluck('total', 'payment_method');
 
-        $totalExpenses = DailyExpense::where('user_id', Auth::id())
-            ->whereYear('expense_date', $currentYear)
+        $totalExpenses = DailyExpense::whereYear('expense_date', $currentYear)
             ->whereMonth('expense_date', $currentMonth)
             ->sum('amount');
 
-        $totalSalaries = CustomerLog::where('user_id', Auth::id())
-            ->where('status', 'completed')
+        $totalSalaries = CustomerLog::where('status', 'completed')
             ->whereYear('completed_at', $currentYear)
             ->whereMonth('completed_at', $currentMonth)
             ->sum('employee_commission');
@@ -84,9 +80,9 @@ class AccountantController extends Controller
     private function getAccountantData($month, $year)
     {
         $data = [];
-        $data['totalIncome'] = CustomerLog::where('user_id', Auth::id())->where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->where(function ($q) { $q->where('is_vip_top_up', true)->orWhere('payment_method', '!=', 'VIP Card'); })->sum('payment_amount');
-        $data['totalExpenses'] = DailyExpense::where('user_id', Auth::id())->whereYear('expense_date', $year)->whereMonth('expense_date', $month)->sum('amount');
-        $data['totalSalaries'] = CustomerLog::where('user_id', Auth::id())->where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->sum('employee_commission');
+        $data['totalIncome'] = CustomerLog::where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->where(function ($q) { $q->where('is_vip_top_up', true)->orWhere('payment_method', '!=', 'VIP Card'); })->sum('payment_amount');
+        $data['totalExpenses'] = DailyExpense::whereYear('expense_date', $year)->whereMonth('expense_date', $month)->sum('amount');
+        $data['totalSalaries'] = CustomerLog::where('status', 'completed')->whereYear('completed_at', $year)->whereMonth('completed_at', $month)->sum('employee_commission');
         $data['netProfit'] = $data['totalIncome'] - $data['totalExpenses'] - $data['totalSalaries'];
         return $data;
     }

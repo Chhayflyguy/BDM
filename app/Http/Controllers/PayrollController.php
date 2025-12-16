@@ -22,8 +22,7 @@ class PayrollController extends Controller
         $currentMonth = $request->input('month', now()->month);
         $currentYear = $request->input('year', now()->year);
 
-        $employees = Employee::where('user_id', Auth::id())
-            ->with(['completedLogs' => function ($query) use ($currentYear, $currentMonth) {
+        $employees = Employee::with(['completedLogs' => function ($query) use ($currentYear, $currentMonth) {
                 $query->whereYear('completed_at', $currentYear)
                       ->whereMonth('completed_at', $currentMonth)
                       ->where('status', 'completed');
@@ -61,7 +60,7 @@ class PayrollController extends Controller
      */
     public function show(Employee $employee, Request $request)
     {
-        $this->authorize('view', $employee);
+        // All authenticated users can view employee payroll details
 
         $currentMonth = $request->input('month', now()->month);
         $currentYear = $request->input('year', now()->year);
@@ -95,10 +94,7 @@ class PayrollController extends Controller
      */
     public function updateCommission(Request $request, CustomerLog $customerLog)
     {
-        // Authorize - user must own this customer log
-        if ($customerLog->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // No authorization needed - all users can update commissions
 
         $validated = $request->validate([
             'employee_commission' => 'required|numeric|min:0|max:9999.99',

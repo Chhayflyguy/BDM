@@ -20,24 +20,20 @@ class CustomerLogController extends Controller
     use AuthorizesRequests;
     public function index(): View
     {
-        $userId = Auth::id();
-        
-        // Get statistics for dashboard
+        // Get statistics for dashboard (shared across all users)
         $stats = [
-            'total_customers' => Customer::where('user_id', $userId)->count(),
-            'total_employees' => Employee::where('user_id', $userId)->count(),
-            'active_logs' => CustomerLog::where('user_id', $userId)->where('status', 'active')->count(),
-            'completed_logs' => CustomerLog::where('user_id', $userId)->where('status', 'completed')->count(),
-            'today_income' => CustomerLog::where('user_id', $userId)
-                ->where('status', 'completed')
+            'total_customers' => Customer::count(),
+            'total_employees' => Employee::count(),
+            'active_logs' => CustomerLog::where('status', 'active')->count(),
+            'completed_logs' => CustomerLog::where('status', 'completed')->count(),
+            'today_income' => CustomerLog::where('status', 'completed')
                 ->whereDate('completed_at', today())
                 ->where(function ($query) {
                     $query->where('is_vip_top_up', true)
                           ->orWhere('payment_method', '!=', 'VIP Card');
                 })
                 ->sum('payment_amount'),
-            'this_month_income' => CustomerLog::where('user_id', $userId)
-                ->where('status', 'completed')
+            'this_month_income' => CustomerLog::where('status', 'completed')
                 ->whereYear('completed_at', now()->year)
                 ->whereMonth('completed_at', now()->month)
                 ->where(function ($query) {
@@ -45,14 +41,12 @@ class CustomerLogController extends Controller
                           ->orWhere('payment_method', '!=', 'VIP Card');
                 })
                 ->sum('payment_amount'),
-            'pending_bookings' => Customer::where('user_id', $userId)
-                ->whereNotNull('next_booking_date')
+            'pending_bookings' => Customer::whereNotNull('next_booking_date')
                 ->whereDate('next_booking_date', '>=', today())
                 ->count(),
         ];
         
-        $groupedLogs = CustomerLog::with('customer') // Eager load customer relationship
-            ->where('user_id', $userId)
+        $groupedLogs = CustomerLog::with(['customer', 'user']) // Eager load customer and user relationships
             ->latest()
             ->get()
             ->groupBy(function ($log) {
@@ -77,9 +71,8 @@ class CustomerLogController extends Controller
 
     public function create(): View
     {
-        // Only get customers created today by default
-        $todayCustomers = Customer::where('user_id', Auth::id())
-            ->whereDate('created_at', today())
+        // Get all customers created today
+        $todayCustomers = Customer::whereDate('created_at', today())
             ->orderBy('name')
             ->get();
         return view('customer_logs.create', compact('todayCustomers'));
@@ -92,8 +85,7 @@ class CustomerLogController extends Controller
     {
         $query = $request->get('query', '');
         
-        $customers = Customer::where('user_id', Auth::id())
-            ->where(function($q) use ($query) {
+        $customers = Customer::where(function($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                   ->orWhere('customer_gid', 'LIKE', "%{$query}%")
                   ->orWhere('phone', 'LIKE', "%{$query}%");
@@ -137,8 +129,7 @@ class CustomerLogController extends Controller
         // If the log is completed, show the completed edit view with all fields
         if ($customerLog->status === 'completed') {
             // Only show active employees
-            $employees = Employee::where('user_id', Auth::id())
-                ->where('working_status', 'Active')
+            $employees = Employee::where('working_status', 'Active')
                 ->orderBy('name')
                 ->get();
             $products = Product::orderBy('name')->get(); // Show all products for editing
@@ -320,8 +311,7 @@ class CustomerLogController extends Controller
     {
         $this->authorize('update', $customerLog);
         // Only show active employees
-        $employees = Employee::where('user_id', Auth::id())
-            ->where('working_status', 'Active')
+        $employees = Employee::where('working_status', 'Active')
             ->orderBy('name')
             ->get();
         $products = Product::where('quantity', '>', 0)->orderBy('name')->get(); // NEW: Load available products

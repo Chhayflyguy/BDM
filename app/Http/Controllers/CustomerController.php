@@ -30,8 +30,7 @@ class CustomerController extends Controller
         $currentMonth = $request->input('month', now()->month);
         $currentYear = $request->input('year', now()->year);
 
-        $query = Customer::where('user_id', Auth::id())
-            ->whereYear('created_at', $currentYear)
+        $query = Customer::whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth);
 
         if ($request->filled('search')) {
@@ -229,8 +228,7 @@ class CustomerController extends Controller
     {
         $query = $request->get('query', '');
         
-        $customers = Customer::where('user_id', Auth::id())
-            ->where(function($q) use ($query) {
+        $customers = Customer::where(function($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                   ->orWhere('customer_gid', 'LIKE', "%{$query}%")
                   ->orWhere('phone', 'LIKE', "%{$query}%");

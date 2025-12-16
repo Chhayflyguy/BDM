@@ -20,8 +20,8 @@ class DashboardController extends Controller
             'pending_bookings' => Booking::where('status', 'pending')->count(),
             'confirmed_bookings' => Booking::where('status', 'confirmed')->count(),
             'recent_bookings' => Booking::with(['customer', 'service'])->latest()->take(5)->get(),
-            'admin_users' => User::where('is_admin', true)
-                ->select('id', 'name', 'email', 'is_admin', 'created_at')
+            'admin_users' => User::where('role', 'admin')
+                ->select('id', 'name', 'email', 'role', 'created_at')
                 ->orderBy('created_at', 'desc')
                 ->get(),
         ];

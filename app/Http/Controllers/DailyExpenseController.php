@@ -16,8 +16,7 @@ class DailyExpenseController extends Controller
         $currentMonth = $request->input('month', now()->month);
         $currentYear = $request->input('year', now()->year);
 
-        $expensesQuery = DailyExpense::where('user_id', Auth::id())
-            ->whereYear('expense_date', $currentYear)
+        $expensesQuery = DailyExpense::whereYear('expense_date', $currentYear)
             ->whereMonth('expense_date', $currentMonth)
             ->latest('expense_date');
 

@@ -10,17 +10,19 @@ class CustomerPolicy
 {
     /**
      * Determine whether the user can view the model.
+     * All authenticated users can view all customers
      */
     public function view(User $user, Customer $customer): bool
     {
-        return $user->id === $customer->user_id;
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
+     * All authenticated users can update all customers
      */
     public function update(User $user, Customer $customer): bool
     {
-        return $user->id === $customer->user_id;
+        return true;
     }
 }

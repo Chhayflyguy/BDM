@@ -33,15 +33,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers/search', [CustomerController::class, 'searchCustomers'])->name('customers.search');
 
     Route::resource('daily_expenses', DailyExpenseController::class)->except(['show']);
-    Route::get('/accountant', [AccountantController::class, 'index'])->name('accountant.index');
     
-    // Payroll Routes
-Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
-Route::get('/payroll/employee/{employee}', [PayrollController::class, 'show'])->name('payroll.show');
-Route::patch('/payroll/customer-log/{customerLog}/commission', [PayrollController::class, 'updateCommission'])->name('payroll.update-commission');
-Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export'); // MODIFIED
-    // Resource routes
-    Route::resource('employees', EmployeeController::class)->except(['show']); // MODIFIED
+    // Admin-only routes (employees, payroll, accountant)
+    Route::middleware('admin')->group(function () {
+        Route::get('/accountant', [AccountantController::class, 'index'])->name('accountant.index');
+        
+        // Payroll Routes
+        Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
+        Route::get('/payroll/employee/{employee}', [PayrollController::class, 'show'])->name('payroll.show');
+        Route::patch('/payroll/customer-log/{customerLog}/commission', [PayrollController::class, 'updateCommission'])->name('payroll.update-commission');
+        Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export'); // MODIFIED
+        
+        // Resource routes
+        Route::resource('employees', EmployeeController::class)->except(['show']); // MODIFIED
+        Route::post('/accountant/export', [AccountantController::class, 'export'])->name('accountant.export');
+    });
+
     Route::resource('customer_logs', CustomerLogController::class); // MODIFIED: Enable all log routes
     Route::resource('customers', CustomerController::class)->except(['destroy']);
 
@@ -59,16 +66,21 @@ Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payr
     Route::post('/payroll/export', [PayrollController::class, 'export'])->name('payroll.export');
     Route::post('/accountant/export', [AccountantController::class, 'export'])->name('accountant.export');
     
-    //admin route 
-    // Change it to this
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::resource('products', AdminProductController::class);
-    Route::get('/products/{product}/stock', [AdminProductController::class, 'showStockForm'])->name('products.stock');
-    Route::post('/products/{product}/stock', [AdminProductController::class, 'addStock'])->name('products.add-stock');
-    Route::resource('services', AdminServiceController::class);
-    Route::resource('bookings', AdminBookingController::class)->only(['index', 'update', 'destroy']);
-});
+    //admin routes - accessible to all authenticated users except user management and activity logs
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::resource('products', AdminProductController::class);
+        Route::get('/products/{product}/stock', [AdminProductController::class, 'showStockForm'])->name('products.stock');
+        Route::post('/products/{product}/stock', [AdminProductController::class, 'addStock'])->name('products.add-stock');
+        Route::resource('services', AdminServiceController::class);
+        Route::resource('bookings', AdminBookingController::class)->only(['index', 'update', 'destroy']);
+        
+        // Admin-only routes (user management and activity logs)
+        Route::middleware('admin')->group(function () {
+            Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+            Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+        });
+    });
 });
 
 require __DIR__ . '/auth.php';

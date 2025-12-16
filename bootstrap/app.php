@@ -17,9 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
         ]);
 
-        // Register the new IsAdmin middleware with an alias
+        // Register the admin middleware with an alias
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
