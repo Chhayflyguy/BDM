@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Customer;
 use App\Notifications\VipBalanceReset; // NEW
 use Illuminate\Support\Facades\Notification; // NEW
+use Illuminate\Support\Facades\Log; // NEW
 
 class ResetExpiredVipBalances extends Command
 {
@@ -15,20 +16,24 @@ class ResetExpiredVipBalances extends Command
     public function handle()
     {
         $today = now()->toDateString();
-        
+
         $expiredCustomers = Customer::where('vip_card_expires_at', '<', $today)
-                                     ->where('vip_card_balance', '>', 0)
-                                     ->get();
+            ->where('vip_card_balance', '>', 0)
+            ->get();
 
         foreach ($expiredCustomers as $customer) {
             $oldBalance = $customer->vip_card_balance; // Store the old balance before resetting
-            
+
             $customer->vip_card_balance = 0;
             $customer->save();
 
-            // Send notification with the old balance information
-            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
-                        ->notify(new VipBalanceReset($customer, $oldBalance));
+            // Send notification with the old balance information (with error handling)
+            try {
+                Notification::route('telegram', env('TELEGRAM_CHAT_ID'))
+                    ->notify(new VipBalanceReset($customer, $oldBalance));
+            } catch (\Exception $e) {
+                Log::error('Failed to send Telegram notification for VIP balance reset: ' . $e->getMessage());
+            }
         }
 
         $this->info("Reset balances for {$expiredCustomers->count()} expired VIP customers and sent notifications.");

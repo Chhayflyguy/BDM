@@ -14,6 +14,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Notifications\VipPaymentMade;         // NEW: Import the notification class
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log; // NEW
+
 class CustomerLogController extends Controller
 {
     use AuthorizesRequests;
@@ -26,7 +28,7 @@ class CustomerLogController extends Controller
             ->groupBy(function ($log) {
                 return $log->created_at->timezone(config('app.timezone'))->format('Y-m-d');
             });
-        
+
         $dailyTotals = [];
         foreach ($groupedLogs as $date => $logs) {
             $dailyTotals[$date] = [
@@ -68,7 +70,7 @@ class CustomerLogController extends Controller
 
         CustomerLog::create($validated);
 
-         return redirect()->route('dashboard')->with('success', 'New customer log created successfully!');
+        return redirect()->route('dashboard')->with('success', 'New customer log created successfully!');
     }
 
     /**
@@ -96,21 +98,21 @@ class CustomerLogController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Log updated successfully!');
     }
-    
+
     public function destroy(CustomerLog $customerLog): RedirectResponse
     {
         $this->authorize('delete', $customerLog);
         $customerLog->delete();
         return redirect()->route('dashboard')->with('success', 'Customer log deleted successfully!');
     }
-    
+
     public function showCompletionForm(CustomerLog $customerLog): View
     {
         $this->authorize('update', $customerLog);
         $employees = Employee::where('user_id', Auth::id())->orderBy('name')->get(); // NEW
         return view('customer_logs.complete', compact('customerLog', 'employees')); // MODIFIED
     }
-    
+
     public function markAsComplete(Request $request, CustomerLog $customerLog): RedirectResponse
     {
         $this->authorize('update', $customerLog);
@@ -118,9 +120,9 @@ class CustomerLogController extends Controller
         $validated = $request->validate([
             'product_purchased' => 'nullable|string|max:255',
             'product_price' => 'nullable|numeric|min:0',
-            'employee_id' => 'nullable|exists:employees,id', 
+            'employee_id' => 'nullable|exists:employees,id',
             'massage_price' => 'nullable|numeric|min:0',
-            'payment_method' => 'required|string|max:50', 
+            'payment_method' => 'required|string|max:50',
             'next_booking_date' => 'nullable|date|after:today', // NEW
         ]);
 
@@ -138,11 +140,16 @@ class CustomerLogController extends Controller
             }
             $customer->vip_card_balance -= $totalCost;
             $customer->save();
-            
-            // Trigger notification after saving
-            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipPaymentMade($customerLog));
+
+
+            // Send Telegram notification (with error handling)
+            try {
+                Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipPaymentMade($customerLog));
+            } catch (\Exception $e) {
+                Log::error('Failed to send Telegram notification for VIP payment: ' . $e->getMessage());
+            }
         }
-        
+
         $customer = $customerLog->customer;
         if (!empty($validated['next_booking_date'])) {
             $customer->next_booking_date = $validated['next_booking_date'];
@@ -165,7 +172,7 @@ class CustomerLogController extends Controller
         $validated['payment_amount'] = $totalCost;
 
         $customerLog->update($validated);
-        
+
         return redirect()->route('dashboard')->with('success', 'Log for customer ' . $customerLog->customer->name . ' has been completed!');
     }
 

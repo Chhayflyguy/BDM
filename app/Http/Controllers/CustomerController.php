@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule; // NEW
 use App\Notifications\NewCustomerCreated; // NEW
 use App\Notifications\VipBalanceTopUp;   // NEW
 use Illuminate\Support\Facades\Notification; // NEW
+use Illuminate\Support\Facades\Log; // NEW
 use App\Exports\NewCustomersExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
@@ -128,9 +129,12 @@ class CustomerController extends Controller
             ]);
         }
 
-        // THIS IS THE FIX: The notification is now outside the conditional block
-        // and will be sent for every new customer.
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
+        // Send Telegram notification (with error handling)
+        try {
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new NewCustomerCreated($customer));
+        } catch (\Exception $e) {
+            Log::error('Failed to send Telegram notification for new customer: ' . $e->getMessage());
+        }
 
         return redirect()->route('customers.index')->with('success', 'New customer created successfully!');
     }
@@ -209,7 +213,12 @@ class CustomerController extends Controller
             'completed_at' => now()
         ]);
 
-        Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipBalanceTopUp($customer, $package['name']));
+        // Send Telegram notification (with error handling)
+        try {
+            Notification::route('telegram', env('TELEGRAM_CHAT_ID'))->notify(new VipBalanceTopUp($customer, $package['name']));
+        } catch (\Exception $e) {
+            Log::error('Failed to send Telegram notification for VIP top-up: ' . $e->getMessage());
+        }
 
         return redirect()->route('customers.show', $customer)->with('success', 'Balance updated successfully!');
     }
