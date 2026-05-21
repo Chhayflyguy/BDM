@@ -178,6 +178,21 @@
                                 </svg>
                             </a>
 
+                            <a href="{{ route('admin.events.index') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-red-300 hover:shadow-md transition-all duration-200">
+                                <div class="flex-shrink-0 bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-3 group-hover:scale-110 transition-transform">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <h4 class="text-base font-semibold text-gray-900 group-hover:text-red-600">{{ __('messages.manage_events') }}</h4>
+                                    <p class="text-sm text-gray-600 mt-0.5">{{ __('messages.view_update_promotional_events') }}</p>
+                                </div>
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+
                             <a href="{{ route('admin.products.create') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg hover:border-pink-300 hover:shadow-md transition-all duration-200">
                                 <div class="flex-shrink-0 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg p-3 group-hover:scale-110 transition-transform">
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

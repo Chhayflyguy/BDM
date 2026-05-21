@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/products/{product}/stock', [AdminProductController::class, 'addStock'])->name('products.add-stock');
         Route::resource('services', AdminServiceController::class);
         Route::resource('bookings', AdminBookingController::class)->only(['index', 'update', 'destroy']);
+        Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
         
         // Admin-only routes (user management and activity logs)
         Route::middleware('admin')->group(function () {

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\CustomerLog; // NEW
+use App\Models\CustomerLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Validation\Rule; // NEW
-use App\Notifications\NewCustomerCreated; // NEW
-use App\Notifications\VipBalanceTopUp;   // NEW
-use Illuminate\Support\Facades\Notification; // NEW
+use Illuminate\Validation\Rule;
+use App\Notifications\NewCustomerCreated;
+use App\Notifications\VipBalanceTopUp;
+use Illuminate\Support\Facades\Notification;
 use App\Exports\NewCustomersExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
@@ -68,17 +69,19 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'vip_package' => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
-            'vip_card_number' => ['nullable', 'string', 'max:255'],
-            'gender' => 'nullable|in:Male,Female,Other',
-            'age' => 'nullable|integer|min:0',
-            'height' => 'nullable|string|max:10',
-            'weight' => 'nullable|string|max:10',
-            'health_conditions' => 'nullable|array',
-            'problem_areas' => 'nullable|array',
+            'name'             => 'required|string|max:255',
+            'phone'            => 'required|string|max:20|unique:customers,phone',
+            'app_password'     => 'required|string|min:6|confirmed',
+            'vip_package'      => ['nullable', 'string', Rule::in(array_keys($this->vipPackages))],
+            'vip_card_number'  => ['nullable', 'string', 'max:255'],
+            'gender'           => 'nullable|in:Male,Female,Other',
+            'age'              => 'nullable|integer|min:0',
+            'height'           => 'nullable|string|max:10',
+            'weight'           => 'nullable|string|max:10',
+            'health_conditions'=> 'nullable|array',
+            'problem_areas'    => 'nullable|array',
         ]);
+        $validated['app_password'] = Hash::make($validated['app_password']);
 
         if (!empty($validated['vip_package']) && !empty($validated['vip_card_number'])) {
             $prefix = strtoupper(substr($validated['vip_package'], 0, 1));
@@ -99,8 +102,9 @@ class CustomerController extends Controller
             $customerGid = random_int(100000, 999999);
         } while (Customer::where('customer_gid', $customerGid)->exists());
 
-        $validated['user_id'] = Auth::id();
-        $validated['customer_gid'] = $customerGid;
+        $validated['user_id']       = Auth::id();
+        $validated['customer_gid']  = $customerGid;
+        $validated['registered_by'] = 'admin';
 
         if (!empty($validated['vip_package'])) {
             $package = $this->vipPackages[$validated['vip_package']];
@@ -163,17 +167,25 @@ class CustomerController extends Controller
         $this->authorize('update', $customer);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'vip_card_id' => ['nullable', 'string', 'max:255', Rule::unique('customers', 'vip_card_id')->ignore($customer->id)],
-            'vip_card_expires_at' => 'nullable|date',
-            'gender' => 'nullable|in:Male,Female,Other',
-            'age' => 'nullable|integer|min:0',
-            'height' => 'nullable|string|max:10',
-            'weight' => 'nullable|string|max:10',
+            'name'              => 'required|string|max:255',
+            'phone'             => ['required', 'string', 'max:20', Rule::unique('customers', 'phone')->ignore($customer->id)],
+            'app_password'      => 'nullable|string|min:6|confirmed',
+            'vip_card_id'       => ['nullable', 'string', 'max:255', Rule::unique('customers', 'vip_card_id')->ignore($customer->id)],
+            'vip_card_expires_at'=> 'nullable|date',
+            'gender'            => 'nullable|in:Male,Female,Other',
+            'age'               => 'nullable|integer|min:0',
+            'height'            => 'nullable|string|max:10',
+            'weight'            => 'nullable|string|max:10',
             'health_conditions' => 'nullable|array',
-            'problem_areas' => 'nullable|array',
+            'problem_areas'     => 'nullable|array',
         ]);
+
+        // Only update password if admin provided a new one
+        if (!empty($validated['app_password'])) {
+            $validated['app_password'] = Hash::make($validated['app_password']);
+        } else {
+            unset($validated['app_password']);
+        }
 
         $customer->update($validated);
 

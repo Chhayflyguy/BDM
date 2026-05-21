@@ -25,10 +25,31 @@
                             <div>
                                 <x-input-label for="name" :value="__('messages.customer_name')" />
                                 <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
+                                <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
                             <div>
                                 <x-input-label for="phone" :value="__('messages.phone_number')" />
-                                <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" />
+                                <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" required />
+                                <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+                            </div>
+                        </div>
+
+                        <!-- App Credentials (required — admin must set this for the customer to use the app) -->
+                        <div class="mt-6 border-t pt-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">App Login Credentials</h3>
+                            <p class="text-sm text-gray-500 mb-4">
+                                Set a password the customer will use to log into the booking app with their phone number.
+                            </p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="app_password" value="App Password" />
+                                    <x-text-input id="app_password" class="block mt-1 w-full" type="password" name="app_password" required autocomplete="new-password" />
+                                    <x-input-error :messages="$errors->get('app_password')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="app_password_confirmation" value="Confirm Password" />
+                                    <x-text-input id="app_password_confirmation" class="block mt-1 w-full" type="password" name="app_password_confirmation" required autocomplete="new-password" />
+                                </div>
                             </div>
                         </div>
 
@@ -136,10 +157,7 @@
                 prefixSpan.style.display = prefix ? 'inline-flex' : 'none';
             }
 
-            // Initial call to set prefix on page load
             updatePrefix();
-
-            // Listen for changes
             packageSelect.addEventListener('change', updatePrefix);
         }); 
     </script>

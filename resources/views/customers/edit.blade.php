@@ -24,10 +24,29 @@
                         <div>
                             <x-input-label for="name" :value="__('messages.customer_name')" />
                             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $customer->name)" required autofocus />
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
                         <div class="mt-4">
                             <x-input-label for="phone" :value="__('messages.phone_number')" />
-                            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone', $customer->phone)" />
+                            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone', $customer->phone)" required />
+                            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+                        </div>
+
+                        <!-- Admin Password Reset Section -->
+                        <div class="mt-6 border-t pt-6 bg-yellow-50 rounded-lg p-4">
+                            <h3 class="text-base font-semibold text-yellow-800 mb-1">🔑 Reset App Password (Admin Only)</h3>
+                            <p class="text-sm text-yellow-700 mb-4">Leave blank to keep the current password unchanged.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="app_password" value="New App Password" />
+                                    <x-text-input id="app_password" class="block mt-1 w-full" type="password" name="app_password" autocomplete="new-password" />
+                                    <x-input-error :messages="$errors->get('app_password')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="app_password_confirmation" value="Confirm New Password" />
+                                    <x-text-input id="app_password_confirmation" class="block mt-1 w-full" type="password" name="app_password_confirmation" autocomplete="new-password" />
+                                </div>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
