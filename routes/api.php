@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BookingController as ApiBookingController;
 use App\Http\Controllers\Api\AdminBookingController as ApiAdminBookingController;
 use App\Http\Controllers\Api\AuthController as ApiAuthController;
 use App\Http\Controllers\Api\CustomerAuthController as ApiCustomerAuthController;
+use App\Http\Controllers\Api\AiAgentController;
 
 // =========================================================================
 // ADMIN AUTH (email + password for admin users in the Laravel panel)
@@ -71,3 +72,18 @@ Route::post('/products/purchase', [ApiProductController::class, 'purchase']);
 
 Route::get('/events',          [\App\Http\Controllers\Api\EventController::class, 'index']);
 Route::get('/events/{event}',  [\App\Http\Controllers\Api\EventController::class, 'show']);
+
+// =========================================================================
+// AI AGENT ROUTES
+// =========================================================================
+Route::prefix('ai')->group(function () {
+    // Public health check
+    Route::get('/health', [AiAgentController::class, 'health']);
+
+    // Protected AI chat (requires authentication)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/chat',          [AiAgentController::class, 'chat']);
+        Route::post('/clear-session', [AiAgentController::class, 'clearSession']);
+    });
+});
+
